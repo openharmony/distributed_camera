@@ -51,7 +51,6 @@ ohos_executable("dcamera_hdi_sample") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
 
     "${innerkits_path}/native_cpp/camera_source/include",
@@ -81,7 +80,6 @@ ohos_executable("dcamera_hdi_sample") {
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client:distributed_camera_hdf_client",
     "${hdf_uhdf_path}/hdi:libhdi",
     "${fwk_utils_path}:distributedhardwareutils",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard/frameworks/surface:surface",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
@@ -91,6 +89,7 @@ ohos_executable("dcamera_hdi_sample") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "samgr_standard:samgr_proxy",
+    "ipc:ipc_single",
   ]
 
   cflags_cc = cflags

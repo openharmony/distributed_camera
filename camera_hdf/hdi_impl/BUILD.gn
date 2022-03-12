@@ -51,7 +51,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/buffer_handle/export",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
@@ -99,7 +98,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/graphic/standard/frameworks/surface:surface",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
@@ -114,6 +112,7 @@ ohos_shared_library("distributed_camera_hdf") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
   ]
 
   cflags_cc = cflags

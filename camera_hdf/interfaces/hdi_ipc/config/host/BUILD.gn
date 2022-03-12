@@ -41,7 +41,6 @@ ohos_shared_library("distributed_camera_host_config") {
     "//foundation/graphic/standard/interfaces/kits/surface",
     "//foundation/graphic/standard/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
@@ -70,7 +69,6 @@ ohos_shared_library("distributed_camera_host_config") {
     "//utils/native/base:utils",
     "${distributedcamera_hdf_path}/hdi_impl:distributed_camera_hdf",
     "//foundation/graphic/standard/frameworks/surface:surface",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
   ]
 
   defines = [
@@ -81,6 +79,7 @@ ohos_shared_library("distributed_camera_host_config") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
   ]
   install_images = [ chipset_base_dir ]
 
