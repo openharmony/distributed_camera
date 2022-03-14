@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
-module_out_path = "distributedcamera/dcamera_sink_test"
+module_out_path = "distributed_camera/dcamera_sink_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
