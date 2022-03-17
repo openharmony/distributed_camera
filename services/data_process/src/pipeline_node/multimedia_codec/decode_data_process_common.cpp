@@ -45,7 +45,7 @@ int32_t DecodeDataProcess::InitNode()
         return DCAMERA_BAD_TYPE;
     }
     if (sourceConfig_.GetVideoCodecType() == targetConfig_.GetVideoCodecType()) {
-        DHLOGD("Common Disable DecodeNode. The target video codec type %d is the same as the source video codec type %d.",
+        DHLOGD("Disable DecodeNode. The target video codec type %d is the same as the source video codec type %d.",
             sourceConfig_.GetVideoCodecType(), targetConfig_.GetVideoCodecType());
         return DCAMERA_OK;
     }
@@ -408,7 +408,8 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
     size_t validDecodedImageSize = static_cast<size_t>(sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * 4);
     size_t surfaceBufSize = static_cast<size_t>(surBuf->GetSize());
     if (validDecodedImageSize > surfaceBufSize) {
-        DHLOGE("Buffer size error, validDecodedImageSize %d, surBufSize %d.", validDecodedImageSize, surBuf->GetSize());
+        DHLOGE("Buffer size error, validDecodedImageSize %d, surBufSize %d.",
+            validDecodedImageSize, surBuf->GetSize());
         return;
     }
     std::shared_ptr<DataBuffer> bufferOutput = std::make_shared<DataBuffer>(validDecodedImageSize);

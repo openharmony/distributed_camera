@@ -55,7 +55,7 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
             break;
         }
 
-        DHLOGI("zzz test DCameraPhotoSurfaceListenerCommon size: %d", size);
+        DHLOGI("DCameraPhotoSurfaceListenerCommon size: %d", size);
         std::shared_ptr<DataBuffer> dataBuffer = std::make_shared<DataBuffer>(size);
         int32_t ret = memcpy_s(dataBuffer->Data(), dataBuffer->Capacity(), address, size);
         if (ret != EOK) {
