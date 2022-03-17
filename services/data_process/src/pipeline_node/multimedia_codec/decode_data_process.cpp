@@ -105,7 +105,7 @@ int32_t DecodeDataProcess::InitDecoder()
         return err;
     }
 
-    videoDecoder_ = Media::VideoDecoderFactory::CreateByName("OMX_hisi_video_decoder_avc");
+    videoDecoder_ = Media::VideoDecoderFactory::CreateByMime(processType_);
     if (videoDecoder_ == nullptr) {
         DHLOGE("Create video decoder failed.");
         return DCAMERA_INIT_ERR;
@@ -179,8 +179,7 @@ int32_t DecodeDataProcess::SetDecoderOutputSurface()
     }
     decodeConsumerSurface_->SetDefaultWidthAndHeight((int32_t)sourceConfig_.GetWidth(),
         (int32_t)sourceConfig_.GetHeight());
-    sptr<IBufferConsumerListener> decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_,
-        shared_from_this());
+    decodeSurfaceListener_ = new DecodeSurfaceListener(decodeConsumerSurface_, shared_from_this());
     if (decodeConsumerSurface_->RegisterConsumerListener(decodeSurfaceListener_) !=
         SURFACE_ERROR_OK) {
         DHLOGE("Register consumer listener fail.");
@@ -230,11 +229,18 @@ void DecodeDataProcess::ReleaseProcessNode()
             videoDecoder_->Flush();
             videoDecoder_->Stop();
             videoDecoder_->Release();
-            decodeConsumerSurface_ = nullptr;
-            decodeProducerSurface_ = nullptr;
             videoDecoder_ = nullptr;
             decodeVideoCallback_ = nullptr;
         }
+    }
+    if (decodeConsumerSurface_ != nullptr) {
+        int32_t ret = decodeConsumerSurface_->UnregisterConsumerListener();
+        if (ret != SURFACE_ERROR_OK) {
+            DHLOGE("Unregister consumer listener failed. Error type: %d.", ret);
+        }
+        decodeConsumerSurface_ = nullptr;
+        decodeProducerSurface_ = nullptr;
+        decodeSurfaceListener_ = nullptr;
     }
 
     processType_ = "";
@@ -695,6 +701,12 @@ void DecodeSurfaceListener::SetSurface(const sptr<Surface>& surface)
 void DecodeSurfaceListener::SetDecodeVideoNode(const std::weak_ptr<DecodeDataProcess>& decodeVideoNode)
 {
     decodeVideoNode_ = decodeVideoNode;
+}
+
+DecodeSurfaceListener::~DecodeSurfaceListener()
+{
+    DHLOGD("DecodeSurfaceListener : ~DecodeSurfaceListener.");
+    surface_ = nullptr;
 }
 }
 }
