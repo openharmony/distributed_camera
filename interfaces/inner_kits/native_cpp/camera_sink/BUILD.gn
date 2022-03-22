@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_sink_sdk") {
   include_dirs = [
@@ -30,14 +31,14 @@ ohos_shared_library("distributed_camera_sink_sdk") {
   ]
 
   sources = [
-    "src/dcamera_sink_handler_ipc.cpp",
     "src/dcamera_sink_handler.cpp",
+    "src/dcamera_sink_handler_ipc.cpp",
     "src/distributed_camera_sink_proxy.cpp",
   ]
 
   deps = [
-    "//utils/native/base:utils",
     "${fwk_utils_path}:distributedhardwareutils",
+    "//utils/native/base:utils",
   ]
 
   defines = [
