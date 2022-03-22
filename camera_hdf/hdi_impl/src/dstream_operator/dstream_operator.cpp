@@ -494,8 +494,8 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const std::shared_ptr<D
         acceptedBufferNum_[std::make_pair(captureId, streamId)]++;
 
         auto dcStreamInfo = dcStreamInfoMap_.find(streamId);
-        if(dcStreamInfo != dcStreamInfoMap_.end()) {
-            if(dcStreamInfo->second->type_ == DCStreamType::SNAPSHOT_FRAME) {
+        if (dcStreamInfo != dcStreamInfoMap_.end()) {
+            if (dcStreamInfo->second->type_ == DCStreamType::SNAPSHOT_FRAME) {
                 std::vector<std::shared_ptr<CaptureEndedInfo>> info;
                 std::shared_ptr<CaptureEndedInfo> tmp = std::make_shared<CaptureEndedInfo>();
                 tmp->frameCount_ = acceptedBufferNum_[std::make_pair(captureId, streamId)];
