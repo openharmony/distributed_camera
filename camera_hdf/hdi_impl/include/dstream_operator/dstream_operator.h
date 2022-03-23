@@ -64,6 +64,7 @@ public:
     DCamRetCode SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback);
     DCamRetCode SetDeviceCallback(function<void(ErrorType, int)> &errorCbk,
                                   function<void(uint64_t, std::shared_ptr<CameraStandard::CameraMetadata>)> &resultCbk);
+    void SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId);
     void Release();
 
 private:

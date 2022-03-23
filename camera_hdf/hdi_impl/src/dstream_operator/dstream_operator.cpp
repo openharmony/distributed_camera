@@ -493,20 +493,7 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const std::shared_ptr<D
         }
         acceptedBufferNum_[std::make_pair(captureId, streamId)]++;
 
-        auto dcStreamInfo = dcStreamInfoMap_.find(streamId);
-        if (dcStreamInfo != dcStreamInfoMap_.end()) {
-            if (dcStreamInfo->second->type_ == DCStreamType::SNAPSHOT_FRAME) {
-                std::vector<std::shared_ptr<CaptureEndedInfo>> info;
-                std::shared_ptr<CaptureEndedInfo> tmp = std::make_shared<CaptureEndedInfo>();
-                tmp->frameCount_ = acceptedBufferNum_[std::make_pair(captureId, streamId)];
-                tmp->streamId_ = streamId;
-                info.push_back(tmp);
-                if (dcStreamOperatorCallback_) {
-                    dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
-                    DHLOGD("snapshot stream successfully reported captureId = %d streamId = %d.", captureId, streamId);
-                }
-            }
-        }
+        SnapShotStreamOnCaptureEnded(captureId, streamId);
     }
 
     uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
@@ -547,6 +534,27 @@ DCamRetCode DStreamOperator::SetDeviceCallback(
     errorCallback_ = errorCbk;
     resultCallback_ = resultCbk;
     return SUCCESS;
+}
+
+void DStreamOperator::SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId)
+{
+    auto dcStreamInfo = dcStreamInfoMap_.find(streamId);
+    if (dcStreamInfo == dcStreamInfoMap_.end()) {
+        return;
+    }
+    if (dcStreamInfo->second->type_ != DCStreamType::SNAPSHOT_FRAME) {
+        return;
+    }
+    if (dcStreamOperatorCallback_ == nullptr) {
+        return;
+    }
+    std::vector<std::shared_ptr<CaptureEndedInfo>> info;
+    std::shared_ptr<CaptureEndedInfo> tmp = std::make_shared<CaptureEndedInfo>();
+    tmp->frameCount_ = acceptedBufferNum_[std::make_pair(captureId, streamId)];
+    tmp->streamId_ = streamId;
+    info.push_back(tmp);
+    dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
+    DHLOGD("snapshot stream successfully reported captureId = %d streamId = %d.", captureId, streamId);
 }
 
 void DStreamOperator::Release()
