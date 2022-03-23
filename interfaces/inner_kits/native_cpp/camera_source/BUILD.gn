@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_source_sdk") {
   include_dirs = [
@@ -31,16 +32,16 @@ ohos_shared_library("distributed_camera_source_sdk") {
   ]
 
   sources = [
+    "src/callback/dcamera_source_callback.cpp",
+    "src/callback/dcamera_source_callback_stub.cpp",
+    "src/dcamera_source_handler.cpp",
     "src/dcamera_source_handler_ipc.cpp",
     "src/distributed_camera_source_proxy.cpp",
-    "src/dcamera_source_handler.cpp",
-    "src/callback/dcamera_source_callback_stub.cpp",
-    "src/callback/dcamera_source_callback.cpp",
   ]
 
   deps = [
-    "//utils/native/base:utils",
     "${fwk_utils_path}:distributedhardwareutils",
+    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -60,4 +61,3 @@ ohos_shared_library("distributed_camera_source_sdk") {
 
   part_name = "distributed_camera"
 }
-

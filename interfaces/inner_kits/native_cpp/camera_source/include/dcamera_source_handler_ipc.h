@@ -49,6 +49,6 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> serviceHandler_;
     std::mutex initDmsLock_;
 };
-}
-}
-#endif
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // OHOS_DCAMERA_SOURCE_HANDLER_IPC_H
