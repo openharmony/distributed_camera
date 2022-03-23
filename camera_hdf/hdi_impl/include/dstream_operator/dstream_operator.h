@@ -82,6 +82,7 @@ private:
     DCEncodeType ConvertDCEncodeType(std::string &srcEncodeType);
     std::shared_ptr<DCCaptureInfo> BuildSuitableCaptureInfo(const shared_ptr<CaptureInfo>& srcCaptureInfo,
         std::vector<std::shared_ptr<DCStreamInfo>> &srcStreamInfo);
+    void SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
