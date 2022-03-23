@@ -13,7 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
+import(
+    "//foundation/distributedhardware/distributedcamera/distributedcamera.gni")
 
 ohos_shared_library("distributed_camera_channel") {
   include_dirs = [
@@ -32,15 +33,15 @@ ohos_shared_library("distributed_camera_channel") {
   ]
 
   sources = [
-      "src/dcamera_channel_sink_impl.cpp",
-      "src/dcamera_channel_source_impl.cpp",
-      "src/dcamera_softbus_adapter.cpp",
-      "src/dcamera_softbus_session.cpp",
+    "src/dcamera_channel_sink_impl.cpp",
+    "src/dcamera_channel_source_impl.cpp",
+    "src/dcamera_softbus_adapter.cpp",
+    "src/dcamera_softbus_session.cpp",
   ]
 
   deps = [
-    "${fwk_utils_path}:distributedhardwareutils",
     "${common_path}:distributed_camera_utils",
+    "${fwk_utils_path}:distributedhardwareutils",
     "//utils/native/base:utils",
   ]
 
@@ -51,8 +52,8 @@ ohos_shared_library("distributed_camera_channel") {
   ]
 
   external_deps = [
-    "eventhandler:libeventhandler",
     "dsoftbus_standard:softbus_client",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
   ]
 
