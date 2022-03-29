@@ -15,6 +15,7 @@
 
 #include "dcamera_client.h"
 
+#include <securec.h>
 #include "anonymous_string.h"
 #include "camera_metadata_operator.h"
 #include "dcamera_input_callback.h"
@@ -26,7 +27,6 @@
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
-#include "metadata_utils.h"
 #include "metadata_utils.h"
 
 namespace OHOS {
