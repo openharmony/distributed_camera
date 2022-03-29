@@ -240,9 +240,9 @@ bool DCameraHandler::IsValid(DCStreamType type, CameraStandard::CameraPicSize& s
             uint64_t dcResolution = static_cast<uint64_t>(size.width * size.width);
             uint64_t dcMaxResolution = static_cast<uint64_t>(RESOLUTION_MAX_WIDTH_SNAPSHOT *
                                                              RESOLUTION_MAX_HEIGHT_SNAPSHOT);
-            ret = (size.width >= RESOLUTION_MIN_WIDTH) &&
-                    (size.height >= RESOLUTION_MIN_HEIGHT) &&
-                    (dcResolution <= dcMaxResolution);
+            uint64_t dcMinResolution = static_cast<uint64_t>(RESOLUTION_MIN_WIDTH *
+                                                             RESOLUTION_MIN_HEIGHT);
+            ret = (dcResolution >= dcMinResolution) && (dcResolution <= dcMaxResolution);
             break;
         }
         default: {
