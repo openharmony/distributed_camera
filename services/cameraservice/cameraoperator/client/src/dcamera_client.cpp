@@ -421,8 +421,8 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     return DCAMERA_OK;
 }
 
-void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<CameraStandard::CameraMetadata> &cameraMetadata,
-    std::shared_ptr<CameraStandard::PhotoCaptureSetting> &photoCaptureSettings)
+void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<CameraStandard::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings)
 {
     camera_metadata_item_t item;
     int32_t ret = CameraStandard::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
