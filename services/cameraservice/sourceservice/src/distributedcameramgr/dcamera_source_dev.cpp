@@ -57,6 +57,17 @@ DCameraSourceDev::~DCameraSourceDev()
 {
     DHLOGI("DCameraSourceDev Delete devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    eventBus_ = nullptr;
+    hdiCallback_ = nullptr;
+    input_ = nullptr;
+    controller_ = nullptr;
+    stateMachine_ = nullptr;
+    stateListener_ = nullptr;
+
+    eventResultMap_.clear();
+    memberFuncMap_.clear();
+    DHLOGI("DCameraSourceDev Delete devId %s dhId %s end", GetAnonyString(devId_).c_str(),
+        GetAnonyString(dhId_).c_str());
 }
 
 int32_t DCameraSourceDev::InitDCameraSourceDev()
