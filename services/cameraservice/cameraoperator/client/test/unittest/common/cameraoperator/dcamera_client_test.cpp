@@ -17,6 +17,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_client.h"
+#include "dcamera_handler.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -85,6 +86,7 @@ void DCameraClientTest::TearDownTestCase(void)
 void DCameraClientTest::SetUp(void)
 {
     DHLOGI("DCameraClientTest::SetUp");
+    DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     client_ = std::make_shared<DCameraClient>(cameras[0]);
 

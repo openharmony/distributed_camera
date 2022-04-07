@@ -25,6 +25,7 @@
 #include "mock_camera_operator.h"
 #include "mock_dcamera_sink_output.h"
 
+#include "dcamera_handler.h"
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_dev.h"
@@ -103,6 +104,7 @@ std::vector<DCameraIndex> g_testCamIndex;
 void DCameraSinkControllerTest::SetUpTestCase(void)
 {
     GetLocalDeviceNetworkId(g_testDeviceIdController);
+    DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     g_testCamIndex.push_back(DCameraIndex(g_testDeviceIdController, cameras[0]));
 }
@@ -116,6 +118,7 @@ void DCameraSinkControllerTest::SetUp(void)
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     controller_ = std::make_shared<DCameraSinkController>(accessControl_);
 
+    DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     controller_->channel_ = std::make_shared<MockCameraChannel>();
     controller_->operator_ = std::make_shared<MockCameraOperator>();

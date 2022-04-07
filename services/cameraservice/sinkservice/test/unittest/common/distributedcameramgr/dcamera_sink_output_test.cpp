@@ -23,6 +23,7 @@
 #include "mock_camera_operator.h"
 #include "mock_dcamera_sink_data_process.h"
 
+#include "dcamera_handler.h"
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_controller.h"
 #include "dcamera_sink_data_process.h"
@@ -114,6 +115,7 @@ void DCameraSinkOutputTest::TearDownTestCase(void)
 
 void DCameraSinkOutputTest::SetUp(void)
 {
+    DCameraHandler::GetInstance().Initialize();
     std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     operator_ = std::make_shared<MockCameraOperator>();
     output_ = std::make_shared<DCameraSinkOutput>(cameras[0], operator_);
