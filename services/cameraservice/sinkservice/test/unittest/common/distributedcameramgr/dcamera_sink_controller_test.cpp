@@ -25,6 +25,7 @@
 #include "mock_camera_operator.h"
 #include "mock_dcamera_sink_output.h"
 
+#include "dcamera_handler.h"
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_sink_access_control.h"
 #include "dcamera_sink_dev.h"
@@ -46,7 +47,7 @@ public:
     std::shared_ptr<ICameraSinkAccessControl> accessControl_;
 };
 std::string g_testDeviceIdController;
-const std::string TEST_DH_ID = "Camera_device@3.5/legacy/1";
+
 const std::string SESSION_FLAG_CONTINUE = "dataContinue";
 const std::string SESSION_FLAG_SNAPSHOT = "dataSnapshot";
 const std::string TEST_DEVICE_ID_EMPTY = "";
@@ -103,7 +104,9 @@ std::vector<DCameraIndex> g_testCamIndex;
 void DCameraSinkControllerTest::SetUpTestCase(void)
 {
     GetLocalDeviceNetworkId(g_testDeviceIdController);
-    g_testCamIndex.push_back(DCameraIndex(g_testDeviceIdController, TEST_DH_ID));
+    DCameraHandler::GetInstance().Initialize();
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
+    g_testCamIndex.push_back(DCameraIndex(g_testDeviceIdController, cameras[0]));
 }
 
 void DCameraSinkControllerTest::TearDownTestCase(void)
@@ -115,11 +118,13 @@ void DCameraSinkControllerTest::SetUp(void)
     accessControl_ = std::make_shared<DCameraSinkAccessControl>();
     controller_ = std::make_shared<DCameraSinkController>(accessControl_);
 
+    DCameraHandler::GetInstance().Initialize();
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
     controller_->channel_ = std::make_shared<MockCameraChannel>();
     controller_->operator_ = std::make_shared<MockCameraOperator>();
-    controller_->output_ = std::make_shared<MockDCameraSinkOutput>(TEST_DH_ID, controller_->operator_);
+    controller_->output_ = std::make_shared<MockDCameraSinkOutput>(cameras[0], controller_->operator_);
     controller_->srcDevId_ = g_testDeviceIdController;
-    controller_->dhId_ = TEST_DH_ID;
+    controller_->dhId_ = cameras[0];
 }
 
 void DCameraSinkControllerTest::TearDown(void)

@@ -17,6 +17,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_client.h"
+#include "dcamera_handler.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -57,7 +58,6 @@ const int32_t TEST_HEIGHT = 1080;
 const int32_t TEST_FORMAT_3 = 3;
 const int32_t TEST_FORMAT_4 = 4;
 const int32_t TEST_SLEEP_SEC = 2;
-const std::string TEST_CAMERA_ID = "Camera_device@3.5/legacy/1";
 
 class DCameraClientTest : public testing::Test {
 public:
@@ -86,7 +86,9 @@ void DCameraClientTest::TearDownTestCase(void)
 void DCameraClientTest::SetUp(void)
 {
     DHLOGI("DCameraClientTest::SetUp");
-    client_ = std::make_shared<DCameraClient>(TEST_CAMERA_ID);
+    DCameraHandler::GetInstance().Initialize();
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
+    client_ = std::make_shared<DCameraClient>(cameras[0]);
 
     photoInfo_false_ = std::make_shared<DCameraCaptureInfo>();
     photoInfo_false_->width_ = TEST_WIDTH;

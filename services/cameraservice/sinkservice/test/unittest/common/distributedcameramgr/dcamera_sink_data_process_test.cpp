@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 #include <securec.h>
 
+#include "dcamera_handler.h"
 #include "distributed_camera_errno.h"
 #include "mock_camera_channel.h"
 #include "mock_data_process_pipeline.h"
@@ -40,7 +41,7 @@ public:
     std::shared_ptr<DCameraSinkDataProcess> dataProcess_;
     std::shared_ptr<ICameraChannel> channel_;
 };
-const std::string TEST_DH_ID = "Camera_device@3.5/legacy/1";
+
 const std::string TEST_STRING = "test_string";
 const int32_t TEST_WIDTH = 1080;
 const int32_t TEST_HEIGHT = 1920;
@@ -96,7 +97,9 @@ void DCameraSinkDataProcessTest::TearDownTestCase(void)
 void DCameraSinkDataProcessTest::SetUp(void)
 {
     channel_ = std::make_shared<MockCameraChannel>();
-    dataProcess_ = std::make_shared<DCameraSinkDataProcess>(TEST_DH_ID, channel_);
+    DCameraHandler::GetInstance().Initialize();
+    std::vector<std::string> cameras = DCameraHandler::GetInstance().GetCameras();
+    dataProcess_ = std::make_shared<DCameraSinkDataProcess>(cameras[0], channel_);
 
     dataProcess_->pipeline_ = std::make_shared<MockDataProcessPipeline>();
     dataProcess_->captureInfo_ = g_testCaptureInfoContinuousNeedEncode;
