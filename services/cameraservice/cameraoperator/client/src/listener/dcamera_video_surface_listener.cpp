@@ -31,22 +31,26 @@ DCameraVideoSurfaceListener::DCameraVideoSurfaceListener(const sptr<Surface>& su
 void DCameraVideoSurfaceListener::OnBufferAvailable()
 {
     DHLOGI("DCameraVideoSurfaceListener::OnBufferAvailable");
-    OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
+    if (callback_ == nullptr || surface_ == nullptr) {
+        DHLOGE("DCameraVideoSurfaceListener ResultCallback or Surface is null");
+        return;
+    }
+
     int32_t flushFence = 0;
     int64_t timestamp = 0;
     OHOS::Rect damage;
+    OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
+    surface_->AcquireBuffer(buffer, flushFence, timestamp, damage);
+    if (buffer == nullptr) {
+        DHLOGE("DCameraVideoSurfaceListener AcquireBuffer failed");
+        return;
+    }
 
     do {
-        surface_->AcquireBuffer(buffer, flushFence, timestamp, damage);
-        if (buffer == nullptr) {
-            DHLOGE("DCameraVideoSurfaceListener AcquireBuffer failed");
-            break;
-        }
-
-        char *address = static_cast<char *>(buffer->GetVirAddr());
-        int32_t size = buffer->GetSize();
         int32_t width = buffer->GetWidth();
         int32_t height = buffer->GetHeight();
+        int32_t size = buffer->GetSize();
+        char *address = static_cast<char *>(buffer->GetVirAddr());
         if ((address == nullptr) || (size <= 0) || (width <= 0) || (height <= 0)) {
             DHLOGE("DCameraVideoSurfaceListener invalid params, width: %d, height: %d, size: %d", width, height, size);
             break;
@@ -63,10 +67,6 @@ void DCameraVideoSurfaceListener::OnBufferAvailable()
             break;
         }
 
-        if (callback_ == nullptr) {
-            DHLOGE("DCameraVideoSurfaceListener ResultCallback is null");
-            break;
-        }
         callback_->OnVideoResult(dataBuffer);
     } while (0);
     surface_->ReleaseBuffer(buffer, -1);

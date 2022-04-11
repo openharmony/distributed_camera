@@ -67,7 +67,7 @@ std::vector<DHItem> DCameraHandler::Query()
             (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
              info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
             DHItem item = CreateDHItem(info);
-            itemList.push_back(item);
+            itemList.emplace_back(item);
         }
     }
     DHLOGI("DCameraHandlerCommon::Query success, get %d items", itemList.size());
@@ -121,7 +121,7 @@ std::vector<std::string> DCameraHandler::GetCameras()
             (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
              info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
             std::string dhId = CAMERA_ID_PREFIX + info->GetID();
-            cameras.push_back(dhId);
+            cameras.emplace_back(dhId);
         }
     }
     DHLOGI("DCameraHandlerCommon::GetCameras success, get %d items", cameras.size());
@@ -151,17 +151,17 @@ DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraInfo>& info)
     std::set<camera_format_t> formatSet;
 
     std::vector<camera_format_t> videoFormats;
-    videoFormats.push_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
+    videoFormats.emplace_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
     ConfigInfo videoConfig = {CONTINUOUS_FRAME, CAMERA_FORMAT_VIDEO, cameraInput};
     ConfigFormatAndResolution(videoConfig, outputFormat,  resolution, videoFormats, formatSet);
 
     std::vector<camera_format_t> previewFormats;
-    previewFormats.push_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
+    previewFormats.emplace_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
     ConfigInfo previewInfo = {CONTINUOUS_FRAME, CAMERA_FORMAT_PREVIEW, cameraInput};
     ConfigFormatAndResolution(previewInfo, outputFormat, resolution, previewFormats, formatSet);
 
     std::vector<camera_format_t> photoFormats;
-    photoFormats.push_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
+    photoFormats.emplace_back(camera_format_t::OHOS_CAMERA_FORMAT_RGBA_8888);
     ConfigInfo photoConfig = {SNAPSHOT_FRAME, CAMERA_FORMAT_PHOTO, cameraInput};
     ConfigFormatAndResolution(photoConfig, outputFormat, resolution, photoFormats, formatSet);
 
@@ -218,7 +218,7 @@ void DCameraHandler::ConfigFormatAndResolution(ConfigInfo& info, Json::Value& ou
     }
 }
 
-bool DCameraHandler::IsValid(DCStreamType type, CameraStandard::CameraPicSize& size)
+bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::CameraPicSize& size)
 {
     bool ret = false;
     switch (type) {

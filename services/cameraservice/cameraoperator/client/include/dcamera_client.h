@@ -69,10 +69,10 @@ private:
     sptr<CameraStandard::CaptureOutput> photoOutput_;
     sptr<CameraStandard::CaptureOutput> previewOutput_;
     sptr<CameraStandard::CaptureOutput> videoOutput_;
+    sptr<DCameraPhotoSurfaceListener> photoListener_;
+    sptr<DCameraVideoSurfaceListener> videoListener_;
     std::shared_ptr<StateCallback> stateCallback_;
     std::shared_ptr<ResultCallback> resultCallback_;
-    std::shared_ptr<DCameraPhotoSurfaceListener> photoListener_;
-    std::shared_ptr<DCameraVideoSurfaceListener> videoListener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -31,18 +31,22 @@ DCameraVideoSurfaceListener::DCameraVideoSurfaceListener(const sptr<Surface>& su
 void DCameraVideoSurfaceListener::OnBufferAvailable()
 {
     DHLOGI("DCameraVideoSurfaceListenerCommon::OnBufferAvailable");
-    OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
+    if (callback_ == nullptr || surface_ == nullptr) {
+        DHLOGE("DCameraVideoSurfaceListenerCommon ResultCallback or Surface is null");
+        return;
+    }
+
     int32_t flushFence = 0;
     int64_t timestamp = 0;
     OHOS::Rect damage;
+    OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
+    surface_->AcquireBuffer(buffer, flushFence, timestamp, damage);
+    if (buffer == nullptr) {
+        DHLOGE("DCameraVideoSurfaceListenerCommon AcquireBuffer failed");
+        return;
+    }
 
     do {
-        surface_->AcquireBuffer(buffer, flushFence, timestamp, damage);
-        if (buffer == nullptr) {
-            DHLOGE("DCameraVideoSurfaceListenerCommon AcquireBuffer failed");
-            break;
-        }
-
         int32_t width = buffer->GetWidth();
         int32_t height = buffer->GetHeight();
         int32_t size = width * height * 4;
@@ -60,10 +64,6 @@ void DCameraVideoSurfaceListener::OnBufferAvailable()
             break;
         }
 
-        if (callback_ == nullptr) {
-            DHLOGE("DCameraVideoSurfaceListenerCommon ResultCallback is null");
-            break;
-        }
         callback_->OnVideoResult(dataBuffer);
     } while (0);
     surface_->ReleaseBuffer(buffer, -1);
