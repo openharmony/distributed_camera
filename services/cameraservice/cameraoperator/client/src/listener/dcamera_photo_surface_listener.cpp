@@ -31,18 +31,22 @@ DCameraPhotoSurfaceListener::DCameraPhotoSurfaceListener(const sptr<Surface>& su
 void DCameraPhotoSurfaceListener::OnBufferAvailable()
 {
     DHLOGI("DCameraPhotoSurfaceListener::OnBufferAvailable");
-    OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
+    if (callback_ == nullptr || surface_ == nullptr) {
+        DHLOGE("DCameraPhotoSurfaceListener ResultCallback or Surface is null");
+        return;
+    }
+
     int32_t flushFence = 0;
     int64_t timestamp = 0;
     OHOS::Rect damage;
+    OHOS::sptr<OHOS::SurfaceBuffer> buffer = nullptr;
+    surface_->AcquireBuffer(buffer, flushFence, timestamp, damage);
+    if (buffer == nullptr) {
+        DHLOGE("DCameraPhotoSurfaceListener AcquireBuffer failed");
+        return;
+    }
 
     do {
-        surface_->AcquireBuffer(buffer, flushFence, timestamp, damage);
-        if (buffer == nullptr) {
-            DHLOGE("DCameraPhotoSurfaceListener AcquireBuffer failed");
-            break;
-        }
-
         char *address = static_cast<char *>(buffer->GetVirAddr());
         int32_t size = static_cast<int32_t>(buffer->GetSize());
         if ((address == nullptr) || (size <= 0)) {
@@ -58,10 +62,6 @@ void DCameraPhotoSurfaceListener::OnBufferAvailable()
             break;
         }
 
-        if (callback_ == nullptr) {
-            DHLOGE("DCameraPhotoSurfaceListener ResultCallback is null");
-            break;
-        }
         callback_->OnPhotoResult(dataBuffer);
     } while (0);
     surface_->ReleaseBuffer(buffer, -1);

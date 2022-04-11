@@ -67,7 +67,7 @@ std::vector<DHItem> DCameraHandler::Query()
             (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
              info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
             DHItem item = CreateDHItem(info);
-            itemList.push_back(item);
+            itemList.emplace_back(item);
         }
     }
     DHLOGI("DCameraHandler::Query success, get %d items", itemList.size());
@@ -121,7 +121,7 @@ std::vector<std::string> DCameraHandler::GetCameras()
             (info->GetPosition() == OHOS_CAMERA_POSITION_BACK &&
              info->GetCameraType() == OHOS_CAMERA_TYPE_LOGICAL)) {
             std::string dhId = CAMERA_ID_PREFIX + info->GetID();
-            cameras.push_back(dhId);
+            cameras.emplace_back(dhId);
         }
     }
     DHLOGI("DCameraHandler::GetCameras success, get %d items", cameras.size());
@@ -231,7 +231,7 @@ void DCameraHandler::ConfigFormatAndResolution(ConfigInfo& info, Json::Value& ou
     }
 }
 
-bool DCameraHandler::IsValid(DCStreamType type, CameraStandard::CameraPicSize& size)
+bool DCameraHandler::IsValid(const DCStreamType type, const CameraStandard::CameraPicSize& size)
 {
     bool ret = false;
     switch (type) {

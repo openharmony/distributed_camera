@@ -153,6 +153,39 @@ int32_t DCameraClient::StopCapture()
             DHLOGE("DCameraClient::StopCapture videoOutput stop failed, cameraId: %s, ret: %d",
                    GetAnonyString(cameraId_).c_str(), ret);
         }
+        DHLOGI("DCameraClient::StopCapture %s release videoOutput", GetAnonyString(cameraId_).c_str());
+        videoOutput_->Release();
+        videoOutput_ = nullptr;
+    }
+
+    if (videoSurface_ != nullptr) {
+        DHLOGI("DCameraClient::StopCapture %s video surface unregister consumer listener",
+            GetAnonyString(cameraId_).c_str());
+        int32_t ret = videoSurface_->UnregisterConsumerListener();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture %s video surface unregister consumer listener failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+        }
+        videoListener_ = nullptr;
+        videoSurface_ = nullptr;
+    }
+
+    if (photoOutput_ != nullptr) {
+        DHLOGI("DCameraClient::StopCapture %s release photoOutput", GetAnonyString(cameraId_).c_str());
+        photoOutput_->Release();
+        photoOutput_ = nullptr;
+    }
+
+    if (photoSurface_ != nullptr) {
+        DHLOGI("DCameraClient::StopCapture %s photo surface unregister consumer listener",
+            GetAnonyString(cameraId_).c_str());
+        int32_t ret = photoSurface_->UnregisterConsumerListener();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture %s photo surface unregister consumer listener failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+        }
+        photoListener_ = nullptr;
+        photoSurface_ = nullptr;
     }
 
     if (captureSession_ != nullptr) {
@@ -164,17 +197,15 @@ int32_t DCameraClient::StopCapture()
         }
         DHLOGI("DCameraClient::StopCapture %s release captureSession", GetAnonyString(cameraId_).c_str());
         captureSession_->Release();
+        captureSession_ = nullptr;
     }
 
     if (cameraInput_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
         cameraInput_->Release();
+        cameraInput_ = nullptr;
     }
 
-    photoOutput_ = nullptr;
-    videoOutput_ = nullptr;
-    cameraInput_ = nullptr;
-    captureSession_ = nullptr;
     DHLOGI("DCameraClient::StopCapture %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
 }
@@ -317,7 +348,7 @@ int32_t DCameraClient::CreatePhotoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     photoSurface_ = Surface::CreateSurfaceAsConsumer();
     photoSurface_->SetDefaultWidthAndHeight(info->width_, info->height_);
     photoSurface_->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(info->format_));
-    photoListener_ = std::make_shared<DCameraPhotoSurfaceListener>(photoSurface_, resultCallback_);
+    photoListener_ = new DCameraPhotoSurfaceListener(photoSurface_, resultCallback_);
     photoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)photoListener_);
     photoOutput_ = cameraManager_->CreatePhotoOutput(photoSurface_);
     if (photoOutput_ == nullptr) {
@@ -338,7 +369,7 @@ int32_t DCameraClient::CreateVideoOutput(std::shared_ptr<DCameraCaptureInfo>& in
     videoSurface_ = Surface::CreateSurfaceAsConsumer();
     videoSurface_->SetDefaultWidthAndHeight(info->width_, info->height_);
     videoSurface_->SetUserData(CAMERA_SURFACE_FORMAT, std::to_string(info->format_));
-    videoListener_ = std::make_shared<DCameraVideoSurfaceListener>(videoSurface_, resultCallback_);
+    videoListener_ = new DCameraVideoSurfaceListener(videoSurface_, resultCallback_);
     videoSurface_->RegisterConsumerListener((sptr<IBufferConsumerListener> &)videoListener_);
     videoOutput_ = cameraManager_->CreateVideoOutput(videoSurface_);
     if (videoOutput_ == nullptr) {

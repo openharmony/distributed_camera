@@ -56,7 +56,7 @@ private:
     std::string GetCameraPosition(camera_position_enum_t position);
     void ConfigFormatAndResolution(ConfigInfo& info, Json::Value& outputFormat, Json::Value& resolution,
                                    std::vector<camera_format_t>& formatList, std::set<camera_format_t>& formatSet);
-    bool IsValid(DCStreamType type, CameraStandard::CameraPicSize& size);
+    bool IsValid(const DCStreamType type, const CameraStandard::CameraPicSize& size);
 
     sptr<CameraStandard::CameraManager> cameraManager_;
     std::shared_ptr<PluginListener> pluginListener_;
