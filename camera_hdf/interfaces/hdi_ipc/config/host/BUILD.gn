@@ -47,11 +47,6 @@ ohos_shared_library("distributed_camera_host_config") {
     "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
   ]
 
-  cflags = [
-    "-fPIC",
-    "-Wall",
-  ]
-
   sources = [ "dcamera_host_config.cpp" ]
 
   deps = [
@@ -72,7 +67,6 @@ ohos_shared_library("distributed_camera_host_config") {
   ]
   install_images = [ chipset_base_dir ]
 
-  cflags_cc = cflags
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"

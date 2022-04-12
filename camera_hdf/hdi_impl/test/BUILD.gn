@@ -61,11 +61,6 @@ ohos_executable("dcamera_hdi_sample") {
     "${fwk_common_path}/utils/include",
   ]
 
-  cflags = [
-    "-fPIC",
-    "-Wall",
-  ]
-
   deps = [
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client:distributed_camera_hdf_client",
     "${fwk_utils_path}:distributedhardwareutils",
@@ -83,7 +78,6 @@ ohos_executable("dcamera_hdi_sample") {
     "samgr_standard:samgr_proxy",
   ]
 
-  cflags_cc = cflags
   part_name = "distributed_camera"
   subsystem_name = "distributedhardware"
 }
