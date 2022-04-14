@@ -158,34 +158,10 @@ int32_t DCameraClient::StopCapture()
         videoOutput_ = nullptr;
     }
 
-    if (videoSurface_ != nullptr) {
-        DHLOGI("DCameraClient::StopCapture %s video surface unregister consumer listener",
-            GetAnonyString(cameraId_).c_str());
-        int32_t ret = videoSurface_->UnregisterConsumerListener();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StopCapture %s video surface unregister consumer listener failed, ret: %d",
-                GetAnonyString(cameraId_).c_str(), ret);
-        }
-        videoListener_ = nullptr;
-        videoSurface_ = nullptr;
-    }
-
     if (photoOutput_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s release photoOutput", GetAnonyString(cameraId_).c_str());
         photoOutput_->Release();
         photoOutput_ = nullptr;
-    }
-
-    if (photoSurface_ != nullptr) {
-        DHLOGI("DCameraClient::StopCapture %s photo surface unregister consumer listener",
-            GetAnonyString(cameraId_).c_str());
-        int32_t ret = photoSurface_->UnregisterConsumerListener();
-        if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StopCapture %s photo surface unregister consumer listener failed, ret: %d",
-                GetAnonyString(cameraId_).c_str(), ret);
-        }
-        photoListener_ = nullptr;
-        photoSurface_ = nullptr;
     }
 
     if (captureSession_ != nullptr) {
@@ -204,6 +180,30 @@ int32_t DCameraClient::StopCapture()
         DHLOGI("DCameraClient::StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
         cameraInput_->Release();
         cameraInput_ = nullptr;
+    }
+
+    if (videoSurface_ != nullptr) {
+        DHLOGI("DCameraClient::StopCapture %s video surface unregister consumer listener",
+            GetAnonyString(cameraId_).c_str());
+        int32_t ret = videoSurface_->UnregisterConsumerListener();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture %s video surface unregister consumer listener failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+        }
+        videoListener_ = nullptr;
+        videoSurface_ = nullptr;
+    }
+
+    if (photoSurface_ != nullptr) {
+        DHLOGI("DCameraClient::StopCapture %s photo surface unregister consumer listener",
+            GetAnonyString(cameraId_).c_str());
+        int32_t ret = photoSurface_->UnregisterConsumerListener();
+        if (ret != DCAMERA_OK) {
+            DHLOGE("DCameraClient::StopCapture %s photo surface unregister consumer listener failed, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
+        }
+        photoListener_ = nullptr;
+        photoSurface_ = nullptr;
     }
 
     DHLOGI("DCameraClient::StopCapture %s success", GetAnonyString(cameraId_).c_str());
