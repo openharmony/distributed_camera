@@ -303,7 +303,7 @@ bool FpsControllerProcess::ReduceFrameRateByUniformStrategy(int32_t incomingFrmR
     return isDrop;
 }
 
-int32_t FpsControllerProcess::FpsControllerDone(std::vector<std::shared_ptr<DataBuffer>> outputBuffers)
+int32_t FpsControllerProcess::FpsControllerDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
     if (outputBuffers.empty()) {
         DHLOGE("The received data buffers is empty.");

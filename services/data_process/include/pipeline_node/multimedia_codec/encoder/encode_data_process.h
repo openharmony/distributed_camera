@@ -16,23 +16,23 @@
 #ifndef OHOS_ENCODE_DATA_PROCESS_H
 #define OHOS_ENCODE_DATA_PROCESS_H
 
-#include "securec.h"
 #include <cstdint>
-#include <vector>
 #include <queue>
+#include <vector>
 
-#include "surface.h"
-#include "media_errors.h"
 #include "avcodec_common.h"
-#include "format.h"
-#include "avsharedmemory.h"
 #include "avcodec_video_encoder.h"
+#include "avsharedmemory.h"
+#include "format.h"
+#include "media_errors.h"
+#include "securec.h"
+#include "surface.h"
 
+#include "abstract_data_process.h"
 #include "data_buffer.h"
+#include "dcamera_pipeline_sink.h"
 #include "distributed_camera_errno.h"
 #include "image_common_type.h"
-#include "abstract_data_process.h"
-#include "dcamera_pipeline_sink.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -63,15 +63,18 @@ private:
     int32_t InitEncoder();
     int32_t InitEncoderMetadataFormat();
     int32_t InitEncoderBitrateFormat();
+    int32_t StopVideoEncoder();
+    void ReleaseVideoEncoder();
     int32_t FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& inputBuffer);
     sptr<SurfaceBuffer> GetEncoderInputSurfaceBuffer();
     int64_t GetEncoderTimeStamp();
     int32_t GetEncoderOutputBuffer(uint32_t index, Media::AVCodecBufferInfo info);
-    int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>> outputBuffers);
+    int32_t EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
     const static int32_t ENCODER_STRIDE_ALIGNMENT = 8;
     const static int64_t NORM_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2;
+    const static int32_t NORM_RGB32_BUFFER_SIZE = 1920 * 1080 * 4;
     const static uint32_t MAX_FRAME_RATE = 30;
     const static uint32_t MIN_VIDEO_WIDTH = 320;
     const static uint32_t MIN_VIDEO_HEIGHT = 240;

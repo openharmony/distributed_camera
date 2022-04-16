@@ -214,6 +214,49 @@ int32_t EncodeDataProcess::InitEncoderBitrateFormat()
     return DCAMERA_OK;
 }
 
+int32_t EncodeDataProcess::StopVideoEncoder()
+{
+    if (videoEncoder_ == nullptr) {
+        DHLOGE("The video encoder does not exist before StopVideoEncoder.");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = videoEncoder_->Flush();
+    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+        DHLOGE("VideoEncoder flush failed. Error type: %d.", ret);
+        return DCAMERA_BAD_OPERATE;
+    }
+    ret = videoEncoder_->Stop();
+    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+        DHLOGE("VideoEncoder stop failed. Error type: %d.", ret);
+        return DCAMERA_BAD_OPERATE;
+    }
+    return DCAMERA_OK;
+}
+
+void EncodeDataProcess::ReleaseVideoEncoder()
+{
+    std::lock_guard<std::mutex> lck(mtxEncoderState_);
+    DHLOGD("Start release videoEncoder.");
+    if (videoEncoder_ == nullptr) {
+        DHLOGE("The video encoder does not exist before ReleaseVideoEncoder.");
+        encodeProducerSurface_ = nullptr;
+        encodeVideoCallback_ = nullptr;
+        return;
+    }
+
+    int32_t ret = StopVideoEncoder();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("StopVideoEncoder failed.");
+    }
+    ret = videoEncoder_->Release();
+    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+        DHLOGE("VideoEncoder release failed. Error type: %d.", ret);
+    }
+    encodeProducerSurface_ = nullptr;
+    videoEncoder_ = nullptr;
+    encodeVideoCallback_ = nullptr;
+}
+
 void EncodeDataProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%d] node : EncodeNode.", nodeRank_);
@@ -222,18 +265,7 @@ void EncodeDataProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
     }
 
-    {
-        std::lock_guard<std::mutex> lck(mtxEncoderState_);
-        if (videoEncoder_ != nullptr) {
-            DHLOGD("Start release videoEncoder.");
-            videoEncoder_->Flush();
-            videoEncoder_->Stop();
-            videoEncoder_->Release();
-            encodeProducerSurface_ = nullptr;
-            videoEncoder_ = nullptr;
-            encodeVideoCallback_ = nullptr;
-        }
-    }
+    ReleaseVideoEncoder();
 
     waitEncoderOutputCount_ = 0;
     lastFeedEncoderInputBufferTimeUs_ = 0;
@@ -400,7 +432,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
     return EncodeDone(nextInputBuffers);
 }
 
-int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>> outputBuffers)
+int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
     DHLOGD("Encoder done.");
     if (outputBuffers.empty()) {
