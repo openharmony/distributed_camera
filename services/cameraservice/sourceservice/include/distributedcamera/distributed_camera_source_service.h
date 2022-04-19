@@ -24,6 +24,7 @@
 #include "ipc_object_stub.h"
 
 #include "dcamera_index.h"
+#include "dcamera_service_state_listener.h"
 #include "dcamera_source_dev.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_source_stub.h"
@@ -60,7 +61,7 @@ private:
     bool registerToService_ = false;
     DCameraServiceState state_ = DCameraServiceState::DCAMERA_SRV_STATE_NOT_START;
 
-    sptr<IDCameraSourceCallback> callbackProxy_;
+    std::shared_ptr<ICameraStateListener> listener_;
     std::string sourceVer_;
 };
 } // namespace DistributedHardware

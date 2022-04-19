@@ -14,6 +14,9 @@
  */
 
 #include "dmetadata_processor.h"
+
+#include <functional>
+
 #include "dbuffer_manager.h"
 #include "dcamera_utils_tools.h"
 #include "distributed_hardware_log.h"
@@ -34,7 +37,13 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         if (rootValue.isMember("MetaData") && rootValue["MetaData"].isString()) {
             std::string metadataStr = rootValue["MetaData"].asString();
             if (!metadataStr.empty()) {
-                dCameraAbility_ = CameraStandard::MetadataUtils::DecodeFromString(Base64Decode(metadataStr));
+                std::hash<std::string> h;
+                DHLOGI("Decode distributed camera metadata from base64, hash: %zu, length: %zu",
+                    h(metadataStr), metadataStr.length());
+                std::string decodeString = Base64Decode(metadataStr);
+                DHLOGI("Decode distributed camera metadata from string, hash: %zu, length: %zu",
+                    h(decodeString), decodeString.length());
+                dCameraAbility_ = CameraStandard::MetadataUtils::DecodeFromString(decodeString);
                 DHLOGI("Decode distributed camera metadata from string success.");
             }
         }

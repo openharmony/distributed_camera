@@ -15,6 +15,8 @@
 
 #include "dcamera_handler.h"
 
+#include <functional>
+
 #include "anonymous_string.h"
 #include "avcodec_info.h"
 #include "avcodec_list.h"
@@ -168,9 +170,15 @@ DHItem DCameraHandler::CreateDHItem(sptr<CameraStandard::CameraInfo>& info)
     root[CAMERA_FORMAT_KEY] = outputFormat;
     root[CAMERA_RESOLUTION_KEY] = resolution;
 
+    std::hash<std::string> h;
     std::string abilityString = cameraInput->GetCameraSettings();
+    DHLOGI("DCameraHandlerCommon::CreateDHItem abilityString hash: %zu, length: %zu",
+        h(abilityString), abilityString.length());
+
     std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
-                                            abilityString.length());
+        abilityString.length());
+    DHLOGI("DCameraHandlerCommon::CreateDHItem encodeString hash: %zu, length: %zu",
+        h(encodeString), encodeString.length());
     root[CAMERA_METADATA_KEY] = Json::Value(encodeString);
 
     item.attrs = root.toStyledString();

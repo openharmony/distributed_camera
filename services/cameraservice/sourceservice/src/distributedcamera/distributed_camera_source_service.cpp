@@ -23,7 +23,6 @@
 #include "system_ability_definition.h"
 
 #include "anonymous_string.h"
-#include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -89,7 +88,7 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
         return ret;
     }
     sourceVer_ = params;
-    callbackProxy_ = callback;
+    listener_ = std::make_shared<DCameraServiceStateListener>(callback);
     return DCAMERA_OK;
 }
 
@@ -101,7 +100,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);
         return ret;
     }
-    callbackProxy_ = nullptr;
+    listener_ = nullptr;
     return DCAMERA_OK;
 }
 
@@ -117,8 +116,7 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     if (iter == camerasMap_.end()) {
         DHLOGI("DistributedCameraSourceService RegisterDistributedHardware new dev devId: %s, dhId: %s, version: %s",
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
-        std::shared_ptr<ICameraStateListener> listener = std::make_shared<DCameraServiceStateListener>(callbackProxy_);
-        camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener);
+        camDev = std::make_shared<DCameraSourceDev>(devId, dhId, listener_);
         if (camDev == nullptr) {
             return DCAMERA_MEMORY_OPT_ERROR;
         }
