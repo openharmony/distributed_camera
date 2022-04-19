@@ -57,6 +57,16 @@ int64_t GetNowTimeStampUs()
     return nowUs.count();
 }
 
+int32_t GetAlignedHeight(int32_t width)
+{
+    int32_t alignedBits = 32;
+    int32_t alignedHeight = width;
+    if (alignedHeight % alignedBits != 0) {
+        alignedHeight = ((alignedHeight / alignedBits) + 1) * alignedBits;
+    }
+    return alignedHeight;
+}
+
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len)
 {
     std::string ret;

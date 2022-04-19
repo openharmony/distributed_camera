@@ -148,12 +148,10 @@ int32_t EncodeDataProcess::InitEncoderMetadataFormat()
     metadataFormat_.PutStringValue("codec_mime", processType_);
     metadataFormat_.PutIntValue("codec_profile", Media::MPEG4Profile::MPEG4_PROFILE_ADVANCED_CODING);
 
-    int32_t width = (int32_t)sourceConfig_.GetWidth();
-    int32_t height = (int32_t)sourceConfig_.GetHeight();
     metadataFormat_.PutIntValue("pixel_format",  Media::VideoPixelFormat::RGBA);
-    metadataFormat_.PutLongValue("max_input_size", width * height * 4);
-    metadataFormat_.PutIntValue("width", width);
-    metadataFormat_.PutIntValue("height", height);
+    metadataFormat_.PutLongValue("max_input_size", NORM_RGB32_BUFFER_SIZE);
+    metadataFormat_.PutIntValue("width", static_cast<int32_t>(sourceConfig_.GetWidth()));
+    metadataFormat_.PutIntValue("height", static_cast<int32_t>(sourceConfig_.GetHeight()));
     metadataFormat_.PutIntValue("frame_rate", MAX_FRAME_RATE);
     return DCAMERA_OK;
 }
@@ -192,6 +190,49 @@ int32_t EncodeDataProcess::InitEncoderBitrateFormat()
     return DCAMERA_OK;
 }
 
+int32_t EncodeDataProcess::StopVideoEncoder()
+{
+    if (videoEncoder_ == nullptr) {
+        DHLOGE("The video encoder does not exist before StopVideoEncoder.");
+        return DCAMERA_BAD_VALUE;
+    }
+    int32_t ret = videoEncoder_->Flush();
+    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+        DHLOGE("VideoEncoder flush failed. Error type: %d.", ret);
+        return DCAMERA_BAD_OPERATE;
+    }
+    ret = videoEncoder_->Stop();
+    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+        DHLOGE("VideoEncoder stop failed. Error type: %d.", ret);
+        return DCAMERA_BAD_OPERATE;
+    }
+    return DCAMERA_OK;
+}
+
+void EncodeDataProcess::ReleaseVideoEncoder()
+{
+    std::lock_guard<std::mutex> lck(mtxEncoderState_);
+    DHLOGD("Start release videoEncoder.");
+    if (videoEncoder_ == nullptr) {
+        DHLOGE("The video encoder does not exist before ReleaseVideoEncoder.");
+        encodeProducerSurface_ = nullptr;
+        encodeVideoCallback_ = nullptr;
+        return;
+    }
+
+    int32_t ret = StopVideoEncoder();
+    if (ret != DCAMERA_OK) {
+        DHLOGE("StopVideoEncoder failed.");
+    }
+    ret = videoEncoder_->Release();
+    if (ret != Media::MediaServiceErrCode::MSERR_OK) {
+        DHLOGE("VideoEncoder release failed. Error type: %d.", ret);
+    }
+    encodeProducerSurface_ = nullptr;
+    videoEncoder_ = nullptr;
+    encodeVideoCallback_ = nullptr;
+}
+
 void EncodeDataProcess::ReleaseProcessNode()
 {
     DHLOGD("Start release [%d] node : EncodeNode.", nodeRank_);
@@ -200,18 +241,7 @@ void EncodeDataProcess::ReleaseProcessNode()
         nextDataProcess_->ReleaseProcessNode();
     }
 
-    {
-        std::lock_guard<std::mutex> lck(mtxEncoderState_);
-        if (videoEncoder_ != nullptr) {
-            DHLOGD("Start release videoEncoder.");
-            videoEncoder_->Flush();
-            videoEncoder_->Stop();
-            videoEncoder_->Release();
-            encodeProducerSurface_ = nullptr;
-            videoEncoder_ = nullptr;
-            encodeVideoCallback_ = nullptr;
-        }
-    }
+    ReleaseVideoEncoder();
 
     waitEncoderOutputCount_ = 0;
     lastFeedEncoderInputBufferTimeUs_ = 0;
@@ -237,8 +267,8 @@ int32_t EncodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("The video encoder does not exist before encoding data.");
         return DCAMERA_INIT_ERR;
     }
-    size_t bufferSize = 1920 * 1808 * 4;
-    if (inputBuffers[0]->Size() > bufferSize) {
+
+    if (inputBuffers[0]->Size() > NORM_RGB32_BUFFER_SIZE) {
         DHLOGE("EncodeNode input buffer size %d error.", inputBuffers[0]->Size());
         return DCAMERA_MEMORY_OPT_ERROR;
     }
@@ -291,7 +321,6 @@ int32_t EncodeDataProcess::FeedEncoderInputBuffer(std::shared_ptr<DataBuffer>& i
     }
     inputTimeStampUs_ = GetEncoderTimeStamp();
     DHLOGD("Encoder input buffer size %d, timeStamp %lld.", inputBuffer->Size(), (long long)inputTimeStampUs_);
-
     surfacebuffer->GetExtraData()->ExtraSet("timeStamp", inputTimeStampUs_);
     BufferFlushConfig flushConfig = { {0, 0, sourceConfig_.GetWidth(), sourceConfig_.GetHeight()}, 0};
     SurfaceError ret = encodeProducerSurface_->FlushBuffer(surfacebuffer, -1, flushConfig);
@@ -361,7 +390,7 @@ int32_t EncodeDataProcess::GetEncoderOutputBuffer(uint32_t index, Media::AVCodec
     return EncodeDone(nextInputBuffers);
 }
 
-int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>> outputBuffers)
+int32_t EncodeDataProcess::EncodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers)
 {
     DHLOGD("Encoder done.");
     if (outputBuffers.empty()) {

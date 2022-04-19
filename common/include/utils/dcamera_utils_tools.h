@@ -27,6 +27,7 @@ const std::string BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrs
 int32_t GetLocalDeviceNetworkId(std::string& networkId);
 int64_t GetNowTimeStampMs();
 int64_t GetNowTimeStampUs();
+int32_t GetAlignedHeight(int32_t width);
 std::string Base64Encode(const unsigned char *toEncode, unsigned int len);
 std::string Base64Decode(const std::string& basicString);
 bool IsBase64(unsigned char c);

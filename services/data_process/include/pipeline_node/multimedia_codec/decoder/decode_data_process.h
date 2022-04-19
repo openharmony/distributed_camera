@@ -16,31 +16,32 @@
 #ifndef OHOS_DECODE_DATA_PROCESS_H
 #define OHOS_DECODE_DATA_PROCESS_H
 
-#include "securec.h"
+#include <chrono>
 #include <cstdint>
-#include <vector>
 #include <queue>
 #include <thread>
-#include <chrono>
+#include <vector>
 
-#include "surface.h"
-#include "media_errors.h"
 #include "avcodec_common.h"
-#include "format.h"
-#include "avsharedmemory.h"
 #include "avcodec_video_decoder.h"
+#include "avsharedmemory.h"
 #include "event.h"
 #include "event_bus.h"
 #include "event_sender.h"
-#include "eventbus_handler.h"
 #include "event_registration.h"
+#include "eventbus_handler.h"
+#include "format.h"
+#include "ibuffer_consumer_listener.h"
+#include "media_errors.h"
+#include "securec.h"
+#include "surface.h"
 
+#include "abstract_data_process.h"
 #include "data_buffer.h"
+#include "dcamera_codec_event.h"
+#include "dcamera_pipeline_source.h"
 #include "distributed_camera_errno.h"
 #include "image_common_type.h"
-#include "dcamera_codec_event.h"
-#include "abstract_data_process.h"
-#include "dcamera_pipeline_source.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -78,26 +79,31 @@ private:
     int32_t InitDecoder();
     int32_t InitDecoderMetadataFormat();
     int32_t SetDecoderOutputSurface();
+    int32_t StopVideoDecoder();
+    void ReleaseVideoDecoder();
+    void ReleaseDecoderSurface();
+    void ReleaseCodecEvent();
     int32_t FeedDecoderInputBuffer();
     int64_t GetDecoderTimeStamp();
-    int32_t GetAlignedHeight();
     void CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int64_t timeStampUs, int32_t alignedWidth,
         int32_t alignedHeight);
     int32_t CopyYUVPlaneByRow(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     int32_t CheckCopyImageInfo(const ImageUnitInfo& srcImgInfo, const ImageUnitInfo& dstImgInfo);
     bool IsCorrectImageUnitInfo(const ImageUnitInfo& imgInfo);
     void PostOutputDataBuffers(std::shared_ptr<DataBuffer>& outputBuffer);
-    int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>> outputBuffers);
+    int32_t DecodeDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
     const static int32_t VIDEO_DECODER_QUEUE_MAX = 1000;
     const static int32_t MAX_YUV420_BUFFER_SIZE = 1920 * 1080 * 3 / 2 * 2;
+    const static int32_t MAX_RGB32_BUFFER_SIZE = 1920 * 1080 * 4 * 2;
     const static uint32_t MAX_FRAME_RATE = 30;
     const static uint32_t MIN_VIDEO_WIDTH = 320;
     const static uint32_t MIN_VIDEO_HEIGHT = 240;
     const static uint32_t MAX_VIDEO_WIDTH = 1920;
     const static uint32_t MAX_VIDEO_HEIGHT = 1080;
     const static int32_t FIRST_FRAME_INPUT_NUM = 2;
+    const static int32_t RGB32_MEMORY_COEFFICIENT = 4;
 
     std::mutex mtxDecoderState_;
     std::mutex mtxHoldCount_;
@@ -125,21 +131,6 @@ private:
     Media::AVCodecBufferInfo outputInfo_;
     std::queue<std::shared_ptr<DataBuffer>> inputBuffersQueue_;
     std::queue<uint32_t> availableInputIndexsQueue_;
-};
-
-class DecodeSurfaceListener : public IBufferConsumerListener {
-public:
-    DecodeSurfaceListener(sptr<Surface> surface, std::weak_ptr<DecodeDataProcess> decodeVideoNode)
-        : surface_(surface), decodeVideoNode_(decodeVideoNode) {}
-    ~DecodeSurfaceListener();
-
-    void OnBufferAvailable() override;
-    void SetSurface(const sptr<Surface>& surface);
-    void SetDecodeVideoNode(const std::weak_ptr<DecodeDataProcess>& decodeVideoNode);
-
-private:
-    sptr<Surface> surface_;
-    std::weak_ptr<DecodeDataProcess> decodeVideoNode_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

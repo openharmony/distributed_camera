@@ -43,7 +43,7 @@ private:
     float CalculateFrameRate(int64_t nowMs);
     bool IsDropFrame(float incomingFps);
     bool ReduceFrameRateByUniformStrategy(int32_t incomingFps);
-    int32_t FpsControllerDone(std::vector<std::shared_ptr<DataBuffer>> outputBuffers);
+    int32_t FpsControllerDone(std::vector<std::shared_ptr<DataBuffer>>& outputBuffers);
 
 private:
     const static uint32_t MAX_TARGET_FRAME_RATE = 30;
