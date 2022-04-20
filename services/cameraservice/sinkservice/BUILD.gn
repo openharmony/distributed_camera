@@ -108,6 +108,7 @@ ohos_shared_library("distributed_camera_sink") {
     "${services_path}/data_process:distributed_camera_data_process",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
+    ":dcamerasink.cfg",
   ]
 
   defines = [
@@ -127,4 +128,11 @@ ohos_shared_library("distributed_camera_sink") {
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_camera"
+
+}
+ohos_prebuilt_etc("dcamerasink.cfg") {
+  relative_install_dir = "init"
+  source = "dcamerasink.cfg"
+  part_name = "distributed_camera"
+  subsystem_name = "distributedhardware"
 }
