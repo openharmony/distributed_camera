@@ -117,6 +117,7 @@ int32_t DistributedCameraSinkService::ReleaseSink()
     }
     camerasMap_.clear();
     DHLOGI("DistributedCameraSinkService::ReleaseSink success");
+    exit(0);
     return DCAMERA_OK;
 }
 
