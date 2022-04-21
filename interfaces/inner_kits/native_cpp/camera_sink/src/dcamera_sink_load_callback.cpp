@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCameraSinkLoadCallback::DCameraSinkLoadCallback(const std::string params) : params_(params) {}
+DCameraSinkLoadCallback::DCameraSinkLoadCallback(const std::string& params) : params_(params) {}
 void DCameraSinkLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
     const sptr<IRemoteObject>& remoteObject)
 {
