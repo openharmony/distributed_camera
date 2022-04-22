@@ -102,6 +102,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
         return ret;
     }
     listener_ = nullptr;
+    DHLOGI("DistributedCameraSourceService exit source sa process.");
     exit(0);
     return DCAMERA_OK;
 }

@@ -36,12 +36,12 @@ DCameraSinkHandler::~DCameraSinkHandler()
 int32_t DCameraSinkHandler::InitSink(const std::string& params)
 {
     DHLOGI("DCameraSinkHandler::InitSink");
-    sptr<DCameraSinkLoadCallback> loadCallback = new DCameraSinkLoadCallback(params);
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
+    sptr<DCameraSinkLoadCallback> loadCallback = new DCameraSinkLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
         DHLOGE("systemAbilityId: %d load filed,result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
@@ -60,7 +60,7 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
     return DCAMERA_OK;
 }
 
-void DCameraSinkHandler::FinishStartSA(const std::string &params)
+void DCameraSinkHandler::FinishStartSA(const std::string& params)
 {
     DCameraSinkHandlerIpc::GetInstance().Init();
     sptr<IDistributedCameraSink> dCameraSinkSrv = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();

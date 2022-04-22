@@ -38,12 +38,12 @@ DCameraSourceHandler::~DCameraSourceHandler()
 int32_t DCameraSourceHandler::InitSource(const std::string& params)
 {
     DHLOGI("DCameraSourceHandler InitSource Start");
-    sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
+    sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
         DHLOGE("systemAbilityId: %d load filed,result code: %d.", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, ret);
