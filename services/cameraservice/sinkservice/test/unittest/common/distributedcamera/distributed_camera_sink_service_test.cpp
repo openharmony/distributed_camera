@@ -14,12 +14,12 @@
  */
 
 #include <gtest/gtest.h>
-#include <memory>
-#define private public
-#include "distributed_camera_sink_service.h"
-#undef private
 
+#include "dcamera_handler.h"
+#include "dcamera_sink_handler.h"
+#include "dcamera_sink_handler_ipc.h"
 #include "distributed_camera_errno.h"
+#include "idistributed_camera_sink.h"
 
 using namespace testing::ext;
 
@@ -32,13 +32,12 @@ public:
     void SetUp();
     void TearDown();
 
-    std::shared_ptr<DistributedCameraSinkService> service_;
+    std::string dhId_;
+    sptr<IDistributedCameraSink> service_;
 };
+
 std::string g_testParams = "";
 std::string g_testCameraInfo = "";
-const int32_t TEST_SA_ID = 4804;
-const bool TEST_RUN_ON_CREATE = true;
-
 std::string g_testChannelInfoContinue = R"({
     "Type": "OPERATION",
     "dhId": "camrea_0",
@@ -46,7 +45,6 @@ std::string g_testChannelInfoContinue = R"({
     "Value": {"SourceDevId": "TestDevId",
     "Detail": [{"DataSessionFlag": "dataContinue", "StreamType": 0}]}
 })";
-
 std::string g_testOpenInfoService = R"({
     "Type": "OPERATION",
     "dhId": "camrea_0",
@@ -64,140 +62,91 @@ void DistributedCameraSinkServiceTest::TearDownTestCase(void)
 
 void DistributedCameraSinkServiceTest::SetUp(void)
 {
-    service_ = std::make_shared<DistributedCameraSinkService>(TEST_SA_ID, TEST_RUN_ON_CREATE);
+    DCameraHandler::GetInstance().Initialize();
+    dhId_ = DCameraHandler::GetInstance().GetCameras().front();
+
+    DCameraSinkHandler::GetInstance().InitSink(g_testParams);
+    service_ = DCameraSinkHandlerIpc::GetInstance().GetSinkLocalDHMS();
 }
 
 void DistributedCameraSinkServiceTest::TearDown(void)
 {
     service_ = nullptr;
+    DCameraSinkHandler::GetInstance().ReleaseSink();
 }
 
 /**
  * @tc.name: dcamera_sink_service_test_001
- * @tc.desc: Verify the InitSink and ReleaseSink function.
+ * @tc.desc: Verify the SubscribeLocalHardware function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6MV
+ * @tc.require: AR000GK6MT
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_001, TestSize.Level1)
 {
-    int32_t ret = service_->InitSink(g_testParams);
+    int32_t ret = service_->SubscribeLocalHardware(dhId_, g_testParams);
     EXPECT_EQ(DCAMERA_OK, ret);
-    EXPECT_EQ(g_testParams, service_->sinkVer_);
-    EXPECT_NE(0, (int32_t)service_->camerasMap_.size());
-
-    ret = service_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
-    EXPECT_EQ(0, (int32_t)service_->camerasMap_.size());
 }
 
 /**
  * @tc.name: dcamera_sink_service_test_002
- * @tc.desc: Verify the SubscribeLocalHardware function.
+ * @tc.desc: Verify the UnSubscribeLocalHardware function.
  * @tc.type: FUNC
  * @tc.require: AR000GK6MT
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_002, TestSize.Level1)
 {
-    int32_t ret = service_->InitSink(g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->SubscribeLocalHardware(service_->camerasMap_.begin()->first, g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ReleaseSink();
+    int32_t ret = service_->UnsubscribeLocalHardware(dhId_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
  * @tc.name: dcamera_sink_service_test_003
- * @tc.desc: Verify the UnSubscribeLocalHardware function.
+ * @tc.desc: Verify the StopCapture function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6MT
+ * @tc.require: AR000GK6N1
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_003, TestSize.Level1)
 {
-    int32_t ret = service_->InitSink(g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->UnsubscribeLocalHardware(service_->camerasMap_.begin()->first);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ReleaseSink();
+    int32_t ret = service_->StopCapture(dhId_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
  * @tc.name: dcamera_sink_service_test_004
- * @tc.desc: Verify the StopCapture function.
+ * @tc.desc: Verify the ChannelNeg function.
  * @tc.type: FUNC
- * @tc.require: AR000GK6N1
+ * @tc.require: AR000GK6MT
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_004, TestSize.Level1)
 {
-    int32_t ret = service_->InitSink(g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->StopCapture(service_->camerasMap_.begin()->first);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ReleaseSink();
+    int32_t ret = service_->ChannelNeg(dhId_, g_testChannelInfoContinue);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
  * @tc.name: dcamera_sink_service_test_005
- * @tc.desc: Verify the ChannelNeg function.
+ * @tc.desc: Verify the GetCameraInfo function.
  * @tc.type: FUNC
  * @tc.require: AR000GK6MT
  */
 HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_005, TestSize.Level1)
 {
-    int32_t ret = service_->InitSink(g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ChannelNeg(service_->camerasMap_.begin()->first, g_testChannelInfoContinue);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ReleaseSink();
+    int32_t ret = service_->GetCameraInfo(dhId_, g_testCameraInfo);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 
 /**
  * @tc.name: dcamera_sink_service_test_006
- * @tc.desc: Verify the GetCameraInfo function.
- * @tc.type: FUNC
- * @tc.require: AR000GK6MT
- */
-HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSize.Level1)
-{
-    int32_t ret = service_->InitSink(g_testParams);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->GetCameraInfo(service_->camerasMap_.begin()->first, g_testCameraInfo);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ReleaseSink();
-    EXPECT_EQ(DCAMERA_OK, ret);
-}
-
-/**
- * @tc.name: dcamera_sink_service_test_007
  * @tc.desc: Verify the OpenChannel and CloseChannel function.
  * @tc.type: FUNC
  * @tc.require: AR000GK6N1
  */
-HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_007, TestSize.Level1)
+HWTEST_F(DistributedCameraSinkServiceTest, dcamera_sink_service_test_006, TestSize.Level1)
 {
-    int32_t ret = service_->InitSink(g_testParams);
+    int32_t ret = service_->OpenChannel(dhId_, g_testOpenInfoService);
     EXPECT_EQ(DCAMERA_OK, ret);
 
-    ret = service_->OpenChannel(service_->camerasMap_.begin()->first, g_testOpenInfoService);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->CloseChannel(service_->camerasMap_.begin()->first);
-    EXPECT_EQ(DCAMERA_OK, ret);
-
-    ret = service_->ReleaseSink();
+    ret = service_->CloseChannel(dhId_);
     EXPECT_EQ(DCAMERA_OK, ret);
 }
 } // namespace DistributedHardware
