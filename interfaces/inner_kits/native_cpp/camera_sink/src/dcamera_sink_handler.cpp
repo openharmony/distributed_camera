@@ -98,6 +98,8 @@ int32_t DCameraSinkHandler::ReleaseSink()
     }
 
     DCameraSinkHandlerIpc::GetInstance().UnInit();
+    std::unique_lock<std::mutex> lock(producerMutex_);
+    state_ = DCAMERA_SA_STATE_STOP;
     DHLOGI("DCameraSinkHandler::ReleaseSink success");
     return DCAMERA_OK;
 }

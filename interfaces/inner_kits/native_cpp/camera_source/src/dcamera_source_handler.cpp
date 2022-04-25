@@ -100,6 +100,8 @@ int32_t DCameraSourceHandler::ReleaseSource()
     }
     dCameraSourceSrv->ReleaseSource();
     DCameraSourceHandlerIpc::GetInstance().UnInit();
+    std::unique_lock<std::mutex> lock(producerMutex_);
+    state_ = DCAMERA_SA_STATE_STOP;
     DHLOGI("DCameraSourceHandler ReleaseSource end");
     return DCAMERA_OK;
 }
