@@ -605,7 +605,7 @@ void DStreamOperator::ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, st
         dstInfo->type_ = DCStreamType::SNAPSHOT_FRAME;
         if (dstInfo->encodeType_ == ENCODE_TYPE_JPEG) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
-        } else if (dstInfo->encodeType_ == ENCODE_TYPE_NULL){
+        } else if (dstInfo->encodeType_ == ENCODE_TYPE_NULL) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
         }
     } else {
