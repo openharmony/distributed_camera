@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSAExitState {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSAExitState);
+class DCameraSAProcessExit {
+DECLARE_SINGLE_INSTANCE_BASE(DCameraSAProcessExit);
 
 public:
     void checkSAProcessState();
@@ -32,8 +32,8 @@ private:
         DCAMERA_SA_EXIT_STATE_START = 0,
         DCAMERA_SA_EXIT_STATE_STOP = 1
     } DCameraSAProcessState;
-    DCameraSAExitState();
-    ~DCameraSAExitState();
+    DCameraSAProcessExit();
+    ~DCameraSAProcessExit();
     DCameraSAProcessState sinkSAProcessState_ = DCAMERA_SA_EXIT_STATE_START;
     DCameraSAProcessState sourceSAProcessState_ = DCAMERA_SA_EXIT_STATE_START;
 };
