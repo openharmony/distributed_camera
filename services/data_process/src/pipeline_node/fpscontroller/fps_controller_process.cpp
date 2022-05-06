@@ -30,7 +30,7 @@ FpsControllerProcess::~FpsControllerProcess()
 }
 
 int32_t FpsControllerProcess::InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
-        VideoConfigParams& processedConfig)
+    VideoConfigParams& processedConfig)
 {
     if (targetConfig.GetFrameRate() > MAX_TARGET_FRAME_RATE) {
         DHLOGE("The target framerate : %d is greater than the max framerate : %d.",

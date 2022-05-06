@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class ColorFormatProcess : public AbstractDataProcess{
+class ColorFormatProcess : public AbstractDataProcess {
 public:
     explicit ColorFormatProcess(const std::weak_ptr<DCameraPipelineSource>& callbackPipSource)
         : callbackPipelineSource_(callbackPipSource) {}

@@ -425,7 +425,7 @@ int32_t ColorFormatProcess::ColorConvertByColorFormat(const ImageUnitInfo& srcIm
     int32_t ret;
     switch (srcImgInfo.colorFormat) {
         case Videoformat::NV12:
-            switch(dstImgInfo.colorFormat) {
+            switch (dstImgInfo.colorFormat) {
                 case Videoformat::NV21:
                     ret = ColorConvertNV12ToNV21(srcImgInfo, dstImgInfo);
                     break;

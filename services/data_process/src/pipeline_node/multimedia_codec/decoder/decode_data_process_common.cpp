@@ -32,7 +32,7 @@ DecodeDataProcess::~DecodeDataProcess()
     }
 }
 
-int32_t DecodeDataProcess::DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
+int32_t DecodeDataProcess::InitNode(const VideoConfigParams& sourceConfig, const VideoConfigParams& targetConfig,
     VideoConfigParams& processedConfig)
 {
     DHLOGD("Common Init DCamera DecodeNode start.");
