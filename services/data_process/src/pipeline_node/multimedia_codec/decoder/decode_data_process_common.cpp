@@ -331,9 +331,9 @@ int32_t DecodeDataProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>&
         DHLOGE("The input data buffers is empty.");
         return DCAMERA_BAD_VALUE;
     }
-    if (sourceConfig_.GetVideoCodecType() == targetConfig_.GetVideoCodecType()) {
+    if (sourceConfig_.GetVideoCodecType() == processedConfig_.GetVideoCodecType()) {
         DHLOGD("The target VideoCodecType : %d is the same as the source VideoCodecType : %d.",
-            sourceConfig_.GetVideoCodecType(), targetConfig_.GetVideoCodecType());
+            sourceConfig_.GetVideoCodecType(), processedConfig_.GetVideoCodecType());
         return DecodeDone(inputBuffers);
     }
 
