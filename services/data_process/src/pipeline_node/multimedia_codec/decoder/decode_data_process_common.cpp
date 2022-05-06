@@ -499,10 +499,10 @@ void DecodeDataProcess::CopyDecodedImage(const sptr<SurfaceBuffer>& surBuf, int6
     }
     bufferOutput->SetInt64("timeUs", timeStampUs);
     bufferOutput->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
-    bufferOutput->SetInt32("alignedWidth", sourceConfig_.GetWidth());
-    bufferOutput->SetInt32("alignedHeight", sourceConfig_.GetHeight());
-    bufferOutput->SetInt32("width", sourceConfig_.GetWidth());
-    bufferOutput->SetInt32("height", sourceConfig_.GetHeight());
+    bufferOutput->SetInt32("alignedWidth", processedConfig_.GetWidth());
+    bufferOutput->SetInt32("alignedHeight", processedConfig_.GetHeight());
+    bufferOutput->SetInt32("width", processedConfig_.GetWidth());
+    bufferOutput->SetInt32("height", processedConfig_.GetHeight());
     PostOutputDataBuffers(bufferOutput);
 }
 

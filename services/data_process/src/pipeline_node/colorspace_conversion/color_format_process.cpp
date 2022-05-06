@@ -98,9 +98,9 @@ int32_t ColorFormatProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>
 
     size_t dstBufsize = sourceConfig_.GetWidth() * sourceConfig_.GetHeight() * YUV_BYTES_PER_PIXEL / Y2UV_RATIO;
     std::shared_ptr<DataBuffer> dstBuf = std::make_shared<DataBuffer>(dstBufsize);
-    ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
-        sourceConfig_.GetWidth(), sourceConfig_.GetHeight(), sourceConfig_.GetWidth() * sourceConfig_.GetHeight(),
-        dstBuf->Size(), dstBuf->Data() };
+    ImageUnitInfo dstImgInfo = { processedConfig_.GetVideoformat(), processedConfig_.GetWidth(),
+        processedConfig_.GetHeight(), processedConfig_.GetWidth(), processedConfig_.GetHeight(),
+        processedConfig_.GetWidth() * processedConfig_.GetHeight(), dstBuf->Size(), dstBuf->Data() };
     if (ColorConvertByColorFormat(srcImgInfo, dstImgInfo) != DCAMERA_OK) {
         DHLOGE("ColorConvertProcess : ColorConvertByColorFormat failed.");
         return DCAMERA_BAD_OPERATE;
@@ -108,10 +108,10 @@ int32_t ColorFormatProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>
 
     dstBuf->SetInt64("timeUs", timeStamp);
     dstBuf->SetInt32("Videoformat", static_cast<int32_t>(processedConfig_.GetVideoformat()));
-    dstBuf->SetInt32("alignedWidth", sourceConfig_.GetWidth());
-    dstBuf->SetInt32("alignedHeight", sourceConfig_.GetHeight());
-    dstBuf->SetInt32("width", sourceConfig_.GetWidth());
-    dstBuf->SetInt32("height", sourceConfig_.GetHeight());
+    dstBuf->SetInt32("alignedWidth", processedConfig_.GetWidth());
+    dstBuf->SetInt32("alignedHeight", processedConfig_.GetHeight());
+    dstBuf->SetInt32("width", processedConfig_.GetWidth());
+    dstBuf->SetInt32("height", processedConfig_.GetHeight());
 
     std::vector<std::shared_ptr<DataBuffer>> outputBuffers;
     outputBuffers.push_back(dstBuf);
