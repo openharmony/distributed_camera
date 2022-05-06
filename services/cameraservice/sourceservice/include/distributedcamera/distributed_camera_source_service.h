@@ -63,7 +63,6 @@ private:
 
     std::shared_ptr<ICameraStateListener> listener_;
     std::string sourceVer_;
-    std::mutex saProcessState_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
