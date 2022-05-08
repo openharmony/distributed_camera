@@ -40,9 +40,9 @@ ohos_shared_library("distributed_camera_host_config") {
     "${hdf_uhdf_path}/include/host",
 
     #producer
-    "//foundation/graphic/standard/frameworks/surface/include",
-    "//foundation/graphic/standard/interfaces/kits/surface",
-    "//foundation/graphic/standard/utils/include",
+    "//foundation/graphic/graphic/frameworks/surface/include",
+    "//foundation/graphic/graphic/interfaces/kits/surface",
+    "//foundation/graphic/graphic/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
@@ -51,7 +51,7 @@ ohos_shared_library("distributed_camera_host_config") {
 
   deps = [
     "${distributedcamera_hdf_path}/hdi_impl:distributed_camera_hdf",
-    "//foundation/graphic/standard/frameworks/surface:surface",
+    "//foundation/graphic/graphic/frameworks/surface:surface",
     "//utils/native/base:utils",
   ]
 
