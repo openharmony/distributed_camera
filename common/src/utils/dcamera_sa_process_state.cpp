@@ -15,43 +15,47 @@
 
 #include "dcamera_sa_process_state.h"
 
+#include <mutex>
+
 #include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DCameraSAProcessState);
 
-DCameraSAProcessState::~DCameraSAProcessState()
-{
-    DHLOGI("DCameraSAProcessState Delete");
-}
+typedef enum {
+    DCAMERA_SA_EXIT_STATE_START = 0,
+    DCAMERA_SA_EXIT_STATE_STOP = 1
+} DCameraSAState;
 
-void DCameraSAProcessState::SetSinkProcessExit()
+DCameraSAState sinkSAState_ = DCAMERA_SA_EXIT_STATE_START;
+DCameraSAState sourceSAState_ = DCAMERA_SA_EXIT_STATE_START;
+std::mutex saProcessState_;
+
+void SetSinkProcessExit()
 {
     DHLOGI("set sink process exit.");
     std::lock_guard<std::mutex> autoLock(saProcessState_);
     sinkSAState_ = DCAMERA_SA_EXIT_STATE_STOP;
-    CheckSAProcessState();
-}
-
-void DCameraSAProcessState::SetSourceProcessExit()
-{
-    DHLOGI("set sources process exit.");
-    std::lock_guard<std::mutex> autoLock(saProcessState_);
-    sourceSAState_ = DCAMERA_SA_EXIT_STATE_STOP;
-    CheckSAProcessState();
-}
-
-void DCameraSAProcessState::CheckSAProcessState()
-{
-    DHLOGI("start exit sa process.");
     DHLOGI("sourceSAState_ = %d sinkSAState_ = %d", sourceSAState_, sinkSAState_);
     if (sourceSAState_ == DCAMERA_SA_EXIT_STATE_START || sinkSAState_ == DCAMERA_SA_EXIT_STATE_START) {
-        DHLOGI("=============DCAMERA_SA_EXIT_STATE_START==============");
         return;
     }
     DHLOGI("exit sa process success.");
     exit(0);
 }
+
+void SetSourceProcessExit()
+{
+    DHLOGI("set sources process exit.");
+    std::lock_guard<std::mutex> autoLock(saProcessState_);
+    sourceSAState_ = DCAMERA_SA_EXIT_STATE_STOP;
+    DHLOGI("sourceSAState_ = %d sinkSAState_ = %d", sourceSAState_, sinkSAState_);
+    if (sourceSAState_ == DCAMERA_SA_EXIT_STATE_START || sinkSAState_ == DCAMERA_SA_EXIT_STATE_START) {
+        return;
+    }
+    DHLOGI("exit sa process success.");
+    exit(0);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

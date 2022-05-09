@@ -16,30 +16,10 @@
 #ifndef DCAMERA_SA_PROCESS_STATE_H
 #define DCAMERA_SA_PROCESS_STATE_H
 
-#include "single_instance.h"
-
-#include <mutex>
-
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraSAProcessState {
-DECLARE_SINGLE_INSTANCE_BASE(DCameraSAProcessState);
-
-public:
-    void SetSinkProcessExit();
-    void SetSourceProcessExit();
-private:
-    typedef enum {
-        DCAMERA_SA_EXIT_STATE_START = 0,
-        DCAMERA_SA_EXIT_STATE_STOP = 1
-    } DCameraSAState;
-    DCameraSAProcessState() = default;
-    ~DCameraSAProcessState();
-    void CheckSAProcessState();
-    DCameraSAState sinkSAState_ = DCAMERA_SA_EXIT_STATE_START;
-    DCameraSAState sourceSAState_ = DCAMERA_SA_EXIT_STATE_START;
-    std::mutex saProcessState_;
-};
+void SetSinkProcessExit();
+void SetSourceProcessExit();
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // DCAMERA_SA_EXIT_STATE_H

@@ -117,8 +117,8 @@ int32_t DistributedCameraSinkService::ReleaseSink()
         }
     }
     camerasMap_.clear();
-    DHLOGI("check source sa state.");
-    DCameraSAProcessState::GetInstance().SetSinkProcessExit();
+    DHLOGI("check sink sa state.");
+    SetSinkProcessExit();
     return DCAMERA_OK;
 }
 

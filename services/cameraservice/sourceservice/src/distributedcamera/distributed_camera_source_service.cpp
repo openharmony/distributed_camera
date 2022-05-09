@@ -104,7 +104,7 @@ int32_t DistributedCameraSourceService::ReleaseSource()
     }
     listener_ = nullptr;
     DHLOGI("check source sa state.");
-    DCameraSAProcessState::GetInstance().SetSourceProcessExit();
+    SetSourceProcessExit();
     return DCAMERA_OK;
 }
 
