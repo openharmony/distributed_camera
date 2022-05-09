@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 typedef enum {
     DCAMERA_SA_EXIT_STATE_START = 0,
     DCAMERA_SA_EXIT_STATE_STOP = 1
@@ -56,6 +55,5 @@ void SetSourceProcessExit()
     DHLOGI("exit sa process success.");
     exit(0);
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS
