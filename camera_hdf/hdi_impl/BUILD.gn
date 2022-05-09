@@ -48,9 +48,9 @@ ohos_shared_library("distributed_camera_hdf") {
     "//third_party/jsoncpp/include",
 
     #producer
-    "//foundation/graphic/standard/frameworks/surface/include",
-    "//foundation/graphic/standard/interfaces/kits/surface",
-    "//foundation/graphic/standard/utils/buffer_handle/export",
+    "//foundation/graphic/graphic/frameworks/surface/include",
+    "//foundation/graphic/graphic/interfaces/kits/surface",
+    "//foundation/graphic/graphic/utils/buffer_handle/export",
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
 
@@ -86,7 +86,7 @@ ohos_shared_library("distributed_camera_hdf") {
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/graphic/standard/frameworks/surface:surface",
+    "//foundation/graphic/graphic/frameworks/surface:surface",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

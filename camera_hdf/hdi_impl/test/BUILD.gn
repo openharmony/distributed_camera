@@ -48,9 +48,9 @@ ohos_executable("dcamera_hdi_sample") {
     "${hdf_uhdf_path}/osal/include",
 
     #producer
-    "//foundation/graphic/standard/frameworks/surface/include",
-    "//foundation/graphic/standard/interfaces/kits/surface",
-    "//foundation/graphic/standard/utils/include",
+    "//foundation/graphic/graphic/frameworks/surface/include",
+    "//foundation/graphic/graphic/interfaces/kits/surface",
+    "//foundation/graphic/graphic/utils/include",
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
 
@@ -69,7 +69,7 @@ ohos_executable("dcamera_hdi_sample") {
     "${innerkits_path}/native_cpp/camera_source:distributed_camera_source_sdk",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//drivers/peripheral/display/hal:hdi_display_gralloc",
-    "//foundation/graphic/standard/frameworks/surface:surface",
+    "//foundation/graphic/graphic/frameworks/surface:surface",
   ]
 
   external_deps = [
