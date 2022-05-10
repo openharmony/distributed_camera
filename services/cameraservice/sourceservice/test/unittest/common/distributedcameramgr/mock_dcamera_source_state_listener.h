@@ -38,6 +38,7 @@ public:
     {
         return DCAMERA_OK;
     }
+
     void SetCallback(sptr<IDCameraSourceCallback> callback)
     {
     }
