@@ -150,8 +150,8 @@ int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>&
             GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
         return ret;
     }
-    DHLOGD("DCameraSourceController ChannelNeg devId: %s, dhId: %s channelNegCommand: %s", GetAnonyString(devId).c_str(),
-        GetAnonyString(dhId).c_str(), cmd.command_.c_str());
+    DHLOGD("DCameraSourceController ChannelNeg devId: %s, dhId: %s channelNegCommand: %s",
+        GetAnonyString(devId).c_str(),GetAnonyString(dhId).c_str(), cmd.command_.c_str());
     ret = camSinkSrv->ChannelNeg(dhId, jsonStr);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceController ChannelNeg rpc failed ret: %d, devId: %s, dhId: %s", ret,

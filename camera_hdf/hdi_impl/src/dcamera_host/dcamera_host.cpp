@@ -140,7 +140,8 @@ DCamRetCode DCameraHost::AddDCameraDevice(const std::shared_ptr<DHBase> &dhBase,
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_ADD);
     }
 
-    DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %s", GetAnonyString(dCameraId).c_str());
+    DHLOGI("DCameraHost::AddDCameraDevice, create dcamera device success, dCameraId: %s",
+        GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
 }
 
@@ -171,7 +172,8 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const std::shared_ptr<DHBase> &dhBa
         dCameraHostCallback_->OnCameraEvent(dCameraId, CameraEvent::CAMERA_EVENT_DEVICE_RMV);
     }
 
-    DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %s", GetAnonyString(dCameraId).c_str());
+    DHLOGI("DCameraHost::RemoveDCameraDevice, remove dcamera device success, dCameraId: %s",
+        GetAnonyString(dCameraId).c_str());
     return DCamRetCode::SUCCESS;
 }
 

@@ -14,10 +14,10 @@
  */
 
 #include "dcamera_device.h"
-#include "anonymous_string.h"
 #include <iostream>
 #include <iterator>
 #include <sstream>
+#include "anonymous_string.h"
 #include "dcamera_host.h"
 #include "dcamera_provider.h"
 #include "dcamera_utils_tools.h"
