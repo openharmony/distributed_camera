@@ -105,7 +105,7 @@ CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
     }
     pDevice = dcameraDevice;
 
-    DHLOGI("DCameraHost::OpenCamera, open camera %s success.", cameraId.c_str());
+    DHLOGI("DCameraHost::OpenCamera, open camera %s success.", GetAnonyString(cameraId).c_str());
     return CamRetCode::NO_ERROR;
 }
 
