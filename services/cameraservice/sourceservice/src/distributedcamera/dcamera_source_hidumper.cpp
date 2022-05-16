@@ -1,0 +1,172 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "dcamera_source_hidumper.h"
+
+#include <iterator>
+
+#include "distributed_camera_errno.h"
+#include "distributed_camera_source_service.h"
+#include "distributed_hardware_log.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+IMPLEMENT_SINGLE_INSTANCE(DcameraSourceHidumper);
+
+namespace {
+const std::string ARGS_HELP = "-h";
+const std::string ARGS_VERSION_INFO = "--version";
+const std::string ARGS_REGISTERED_INFO = "--registered";
+const std::string ARGS_CURRENTSTATE_INFO = "--curState";
+const std::string STATE_INT = "Init";
+const std::string STATE_REGISTERED = "Registered";
+const std::string STATE_OPENED = "Opened";
+const std::string STATE_CONFIG_STREAM = "ConfigStream";
+const std::string STATE_CAPTURE = "Capture";
+
+const std::map<std::string, HidumpFlag> ARGS_MAP = {
+    { ARGS_HELP, HidumpFlag::GET_HELP },
+    { ARGS_REGISTERED_INFO, HidumpFlag::GET_REGISTERED_INFO },
+    { ARGS_CURRENTSTATE_INFO, HidumpFlag::GET_CURRENTSTATE_INFO },
+    { ARGS_VERSION_INFO, HidumpFlag::GET_VERSION_INFO },
+};
+
+const std::map<int32_t, std::string> STATE_MAP = {
+    { DCAMERA_STATE_INIT_DUMP, STATE_INT },
+    { DCAMERA_STATE_REGIST_DUMP, STATE_REGISTERED },
+    { DCAMERA_STATE_OPENED_DUMP, STATE_OPENED },
+    { DCAMERA_STATE_CONFIG_STREAM_DUMP, STATE_CONFIG_STREAM },
+    { DCAMERA_STATE_CAPTURE_DUMP, STATE_CAPTURE },
+};
+}
+
+void DcameraSourceHidumper::SetSourceDumpInfo(CameraDumpInfo& camDumpInfo_)
+{
+    DistributedCameraSourceService::GetDumpInfo(camDumpInfo_);
+}
+
+bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::string& result)
+{
+    DHLOGI("DcameraSourceHidumper Dump args.size():%d.", args.size());
+    result.clear();
+    int32_t argsSize = static_cast<int32_t>(args.size());
+    for (int i = 0; i < argsSize; i++) {
+        DHLOGI("DcameraSourceHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
+    }
+
+    int32_t ret = ProcessDump(args[0], result);
+    return ret;
+}
+
+int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string& result)
+{
+    DHLOGI("ProcessDump Dump.");
+    HidumpFlag hf = HidumpFlag::UNKNOW;
+    auto operatorIter = ARGS_MAP.find(args);
+    if (operatorIter != ARGS_MAP.end()) {
+        hf = operatorIter->second;
+    }
+
+    if (hf == HidumpFlag::GET_HELP) {
+        ShowHelp(result);
+        return DCAMERA_OK;
+    }
+    result.clear();
+    SetSourceDumpInfo(camDumpInfo_);
+    int32_t ret = DCAMERA_BAD_VALUE;
+    switch (hf) {
+        case HidumpFlag::GET_REGISTERED_INFO: {
+            ret = GetRegisteredInfo(result);
+            break;
+        }
+        case HidumpFlag::GET_CURRENTSTATE_INFO: {
+            ret = GetCurrentStateInfo(result);
+            break;
+        }
+        case HidumpFlag::GET_VERSION_INFO: {
+            ret = GetVersionInfo(result);
+            break;
+        }
+        default: {
+            ret = ShowIllegalInfomation(result);
+            break;
+        }
+    }
+
+    return ret;
+}
+
+int32_t DcameraSourceHidumper::GetRegisteredInfo(std::string& result)
+{
+    DHLOGI("GetRegisteredInfo Dump.");
+    result.append("CameraNumber\n")
+          .append(std::to_string(camDumpInfo_.regNumber));
+    return DCAMERA_OK;
+}
+
+int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
+{
+    DHLOGI("GetCurrentStateInfo Dump.");
+    std::map<std::string, int32_t> devState = camDumpInfo_.curState;
+    std::string deviceId;
+    int32_t camState;
+    std::map<std::string, int32_t>::iterator it;
+    for (it = devState.begin(); it != devState.end(); it++) {
+        deviceId = it->first;
+        camState = it->second;
+    }
+    DHLOGI("GetCurrentStateInfo camState is %d.", camState);
+    auto state = STATE_MAP.find(camState);
+    std::string curState;
+    if (state != STATE_MAP.end()) {
+        curState = state->second;
+    }
+    result.append("CameraId                           ")
+          .append("State\n")
+          .append(deviceId)
+          .append("       ")
+          .append(curState);
+    return DCAMERA_OK;
+}
+
+int32_t DcameraSourceHidumper::GetVersionInfo(std::string& result)
+{
+    DHLOGI("GetVersionInfo Dump.");
+    result.append("CameraVersion\n")
+          .append(camDumpInfo_.version);
+    return DCAMERA_OK;
+}
+
+void DcameraSourceHidumper::ShowHelp(std::string& result)
+{
+    DHLOGI("ShowHelp Dump.");
+    result.append("Usage:dump  <command> [options]\n")
+          .append("Description:\n")
+          .append("--version         ")
+          .append("dump camera version in the system\n")
+          .append("--registered      ")
+          .append("dump number of registered cameras in the system\n")
+          .append("--currentState    ")
+          .append("dump current state of the camera in the system\n");
+}
+
+int32_t DcameraSourceHidumper::ShowIllegalInfomation(std::string& result)
+{
+    DHLOGI("ShowIllegalInfomation Dump.");
+    result.append("unkown command");
+    return DCAMERA_OK;
+}
+} // namespace DistributedHardware
+} // namespace OHOS

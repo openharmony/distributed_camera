@@ -20,6 +20,7 @@
 #include "ipc_object_stub.h"
 
 #include "dcamera_sink_dev.h"
+#include "dcamera_sink_hidumper.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_sink_stub.h"
 
@@ -41,6 +42,8 @@ public:
     int32_t GetCameraInfo(const std::string& dhId, std::string& cameraInfo) override;
     int32_t OpenChannel(const std::string& dhId, std::string& openInfo) override;
     int32_t CloseChannel(const std::string& dhId) override;
+    int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    static void GetCamDumpInfo(CameraDumpInfo& camDump);
 
 protected:
     void OnStart() override;

@@ -59,5 +59,11 @@ void DCameraSourceStateMachine::UpdateState(DCameraStateType stateType)
     auto stateMachine = std::shared_ptr<DCameraSourceStateMachine>(shared_from_this());
     currentState_ = DCameraSourceStateFactory::GetInstance().CreateState(stateType, stateMachine);
 }
+
+int32_t DCameraSourceStateMachine::GetCameraState()
+{
+    DHLOGI("GetCameraState In state %d", currentState_->GetStateType());
+    return currentState_->GetStateType();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

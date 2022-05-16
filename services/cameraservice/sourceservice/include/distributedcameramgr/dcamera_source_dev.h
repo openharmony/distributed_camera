@@ -50,6 +50,8 @@ public:
     int32_t UpdateCameraSettings(const std::vector<std::shared_ptr<DCameraSettings>>& settings);
 
     void OnEvent(DCameraSourceEvent& event) override;
+    int32_t GetStateInfo();
+    std::string GetVersion();
 
 public:
     virtual int32_t ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param);
