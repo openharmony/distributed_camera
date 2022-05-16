@@ -66,8 +66,10 @@ bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::stri
         DHLOGI("DcameraSourceHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
-    int32_t ret = ProcessDump(args[0], result);
-    return ret;
+    if (ProcessDump(args[0], result) != DCAMERA_OK) {
+        return false;
+    }
+    return true;
 }
 
 int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string& result)

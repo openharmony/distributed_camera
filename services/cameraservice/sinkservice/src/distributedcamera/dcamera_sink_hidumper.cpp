@@ -51,8 +51,10 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
         DHLOGI("DcameraSinkHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
-    int32_t ret = ProcessDump(args[0], result);
-    return ret;
+    if (ProcessDump(args[0], result) != DCAMERA_OK) {
+        return false;
+    }
+    return true;
 }
 
 int32_t DcameraSinkHidumper::ProcessDump(const std::string& args, std::string& result)
