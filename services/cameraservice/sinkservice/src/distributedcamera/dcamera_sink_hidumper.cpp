@@ -15,8 +15,6 @@
 
 #include "dcamera_sink_hidumper.h"
 
-#include <iterator>
-
 #include "distributed_camera_errno.h"
 #include "distributed_camera_sink_service.h"
 #include "distributed_hardware_log.h"
