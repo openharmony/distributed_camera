@@ -65,6 +65,7 @@ public:
     DCamRetCode SetDeviceCallback(function<void(ErrorType, int)> &errorCbk,
                                   function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk);
     void Release();
+    std::vector<int> GetStreamIds();
 
 private:
     bool IsCapturing();
@@ -83,6 +84,7 @@ private:
     std::shared_ptr<DCCaptureInfo> BuildSuitableCaptureInfo(const shared_ptr<CaptureInfo>& srcCaptureInfo,
         std::vector<std::shared_ptr<DCStreamInfo>> &srcStreamInfo);
     void SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId);
+    bool HasContinuousCaptureInfo(int captureId);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;

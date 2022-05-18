@@ -51,6 +51,7 @@ public:
     }
     int32_t ExecuteReleaseStreams(std::vector<int>& streamIds, bool& isAllRelease)
     {
+        isAllRelease = true;
         return DCAMERA_OK;
     }
     int32_t ExecuteReleaseAllStreams()
@@ -61,7 +62,12 @@ public:
     {
         return DCAMERA_OK;
     }
-    int32_t ExecuteStopCapture()
+    int32_t ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)
+    {
+        isAllStop = true;
+        return DCAMERA_OK;
+    }
+    int32_t ExecuteStopAllCapture()
     {
         return DCAMERA_OK;
     }

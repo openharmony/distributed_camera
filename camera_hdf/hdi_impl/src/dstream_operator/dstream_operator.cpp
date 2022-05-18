@@ -109,7 +109,7 @@ CamRetCode DStreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
                 DHLOGE("Release distributed camera buffer queue for stream %d failed.", id);
                 return MapToExternalRetCode(ret);
             } else {
-                DHLOGE("Release distributed camera buffer queue for stream %d successs.", id);
+                DHLOGI("Release distributed camera buffer queue for stream %d successs.", id);
             }
             stream = nullptr;
             halStreamMap_.erase(id);
@@ -304,17 +304,18 @@ CamRetCode DStreamOperator::CancelCapture(int captureId)
 
     std::unique_lock<std::mutex> lock(requestLock_);
     if (captureId < 0 || halCaptureInfoMap_.find(captureId) == halCaptureInfoMap_.end()) {
-        DHLOGE("Input captureId %d is exist.", captureId);
+        DHLOGE("Input captureId %d is not exist.", captureId);
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    SetCapturing(false);
     std::shared_ptr<DCameraProvider> provider = DCameraProvider::GetInstance();
     if (provider == nullptr) {
         DHLOGE("Distributed camera provider not init.");
         return CamRetCode::DEVICE_ERROR;
     }
-    DCamRetCode ret = provider->StopCapture(dhBase_);
+
+    std::vector<int> streamIds = halCaptureInfoMap_[captureId]->streamIds_;
+    DCamRetCode ret = provider->StopCapture(dhBase_, streamIds);
     if (ret != SUCCESS) {
         DHLOGE("Cancel distributed camera capture failed.");
         return MapToExternalRetCode(ret);
@@ -335,10 +336,37 @@ CamRetCode DStreamOperator::CancelCapture(int captureId)
     if (dcStreamOperatorCallback_) {
         dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
     }
-    cachedDCaptureInfoList_.clear();
-    halCaptureInfoMap_.erase(captureId);
 
+    halCaptureInfoMap_.erase(captureId);
+    if (!HasContinuousCaptureInfo(captureId)) {
+        SetCapturing(false);
+        cachedDCaptureInfoList_.clear();
+    }
+    DHLOGI("DStreamOperator::CancelCapture success, captureId=%d.", captureId);
     return CamRetCode::NO_ERROR;
+}
+
+bool DStreamOperator::HasContinuousCaptureInfo(int captureId)
+{
+    bool flag = false;
+    for (auto iter : halCaptureInfoMap_) {
+        for (auto id : iter.second->streamIds_) {
+            auto dcStreamInfo = dcStreamInfoMap_.find(id);
+            if (dcStreamInfo == dcStreamInfoMap_.end()) {
+                continue;
+            }
+
+            DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, streamId=%d, streamType=%d",
+                captureId, id, dcStreamInfo->second->type_);
+            if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
+                DHLOGI("DStreamOperator::HasContinuousCaptureInfo, captureId=%d, stream %d is continuous stream.",
+                    captureId, id);
+                flag = true;
+                break;
+            }
+        }
+    }
+    return flag;
 }
 
 CamRetCode DStreamOperator::ChangeToOfflineStream(const std::vector<int>& streamIds,
@@ -580,6 +608,19 @@ void DStreamOperator::Release()
     dcStreamOperatorCallback_ = nullptr;
 }
 
+std::vector<int> DStreamOperator::GetStreamIds()
+{
+    DHLOGI("DStreamOperator::GetStreamIds, begin get stream id.");
+    std::vector<int> streamIds;
+    std::string idString = "";
+    for (auto iter : halStreamMap_) {
+        streamIds.push_back(iter.first);
+        idString += (std::to_string(iter.first) + ", ");
+    }
+    DHLOGI("DStreamOperator::GetStreamIds, ids=[%s]", idString.c_str());
+    return streamIds;
+}
+
 bool DStreamOperator::IsCapturing()
 {
     std::unique_lock<mutex> lock(isCapturingLock_);
@@ -658,6 +699,9 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<
                 appendCaptureInfo = cacheCapture;
                 break;
             }
+        }
+        if (isStreaming) {
+            inputCaptureInfo->isCapture_ = false;
         }
     }
     cachedDCaptureInfoList_.clear();
