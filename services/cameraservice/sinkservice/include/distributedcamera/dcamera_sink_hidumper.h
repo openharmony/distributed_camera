@@ -26,7 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DCameraSourceDev;
 enum class HidumpFlag {
-    UNKNOW = 0,
+    UNKNOWN = 0,
     GET_HELP,
     GET_CAMERA_INFO,
     GET_OPENED_INFO,

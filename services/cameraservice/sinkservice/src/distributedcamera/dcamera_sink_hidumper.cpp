@@ -60,7 +60,7 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
 int32_t DcameraSinkHidumper::ProcessDump(const std::string& args, std::string& result)
 {
     DHLOGI("ProcessDump Dump.");
-    HidumpFlag hf = HidumpFlag::UNKNOW;
+    HidumpFlag hf = HidumpFlag::UNKNOWN;
     auto operatorIter = ARGS_MAP.find(args);
     if (operatorIter != ARGS_MAP.end()) {
         hf = operatorIter->second;
@@ -139,7 +139,7 @@ void DcameraSinkHidumper::ShowHelp(std::string& result)
 int32_t DcameraSinkHidumper::ShowIllegalInfomation(std::string& result)
 {
     DHLOGI("ShowIllegalInfomation Dump.");
-    result.append("unkown command");
+    result.append("unknown command");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware
