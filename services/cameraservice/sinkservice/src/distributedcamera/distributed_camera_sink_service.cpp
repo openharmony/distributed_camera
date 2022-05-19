@@ -33,9 +33,12 @@ namespace OHOS {
 namespace DistributedHardware {
 REGISTER_SYSTEM_ABILITY_BY_ID(DistributedCameraSinkService, DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, true);
 
+static CameraDumpInfo g_camDump;
+DistributedCameraSinkService* DistributedCameraSinkService::dcSinkService;
 DistributedCameraSinkService::DistributedCameraSinkService(int32_t saId, bool runOnCreate)
     : SystemAbility(saId, runOnCreate)
 {
+    dcSinkService = this;
 }
 
 void DistributedCameraSinkService::OnStart()
@@ -82,6 +85,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params)
 {
     DHLOGI("DistributedCameraSinkService::InitSink");
     sinkVer_ = params;
+    g_camDump.version = sinkVer_;
     int32_t ret = DCameraHandler::GetInstance().Initialize();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSinkService::InitSink handler initialize failed, ret: %d", ret);
@@ -93,6 +97,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params)
         DHLOGE("DistributedCameraSinkService::InitSink no camera device");
         return DCAMERA_BAD_VALUE;
     }
+    g_camDump.camNumber = cameras.size();
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId);
         ret = sinkDevice->Init();
@@ -253,6 +258,44 @@ int32_t DistributedCameraSinkService::CloseChannel(const std::string& dhId)
     }
     DHLOGI("DistributedCameraSinkService::CloseChannel success");
     return DCAMERA_OK;
+}
+
+int DistributedCameraSinkService::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    DHLOGI("DistributedCameraSinkService Dump.");
+    std::string result;
+    std::vector<std::string> argsStr;
+    for (auto item : args) {
+        argsStr.emplace_back(Str16ToStr8(item));
+    }
+
+    if (!DcameraSinkHidumper::GetInstance().Dump(argsStr, result)) {
+        DHLOGE("Hidump error");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int ret = dprintf(fd, "%s\n", result.c_str());
+    if (ret < 0) {
+        DHLOGE("dprintf error");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return DCAMERA_OK;
+}
+
+void DistributedCameraSinkService::GetCamIds()
+{
+    std::vector<std::string> camIds;
+    for (auto it = camerasMap_.begin(); it != camerasMap_.end(); it++) {
+        camIds.push_back(it->second->GetDhid());
+    }
+    g_camDump.camIds = camIds;
+}
+
+void DistributedCameraSinkService::GetCamDumpInfo(CameraDumpInfo& camDump)
+{
+    dcSinkService->GetCamIds();
+    camDump = g_camDump;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

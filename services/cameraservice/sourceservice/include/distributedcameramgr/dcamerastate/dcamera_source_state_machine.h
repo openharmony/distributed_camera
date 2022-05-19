@@ -27,6 +27,7 @@ public:
     ~DCameraSourceStateMachine();
     int32_t Execute(DCAMERA_EVENT eventType, DCameraSourceEvent& event);
     void UpdateState(DCameraStateType stateType);
+    int32_t GetCameraState();
 
 private:
     std::shared_ptr<DCameraSourceState> currentState_;

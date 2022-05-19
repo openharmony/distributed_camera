@@ -212,5 +212,44 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
     DHLOGI("unload hdf driver end");
     return DCAMERA_OK;
 }
+
+int DistributedCameraSourceService::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    DHLOGI("DistributedCameraSourceService Dump.");
+    std::string result;
+    std::vector<std::string> argsStr;
+    for (auto item : args) {
+        argsStr.emplace_back(Str16ToStr8(item));
+    }
+
+    if (!DcameraSourceHidumper::GetInstance().Dump(argsStr, result)) {
+        DHLOGE("Hidump error");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    int ret = dprintf(fd, "%s\n", result.c_str());
+    if (ret < 0) {
+        DHLOGE("dprintf error");
+        return DCAMERA_BAD_VALUE;
+    }
+
+    return DCAMERA_OK;
+}
+
+void DistributedCameraSourceService::GetDumpInfo(CameraDumpInfo& camDump)
+{
+    camDump.regNumber = camerasMap_.size();
+    std::map<std::string, int32_t> curState;
+    for (auto it = camerasMap_.begin(); it != camerasMap_.end(); it++) {
+        DCameraIndex cam = it->first;
+        std::shared_ptr<DCameraSourceDev> camSourceDev = it->second;
+        camDump.version = camSourceDev->GetVersion();
+        std::string deviceId = GetAnonyString(cam.devId_);
+        deviceId.append(cam.dhId_);
+        int32_t devState = camSourceDev->GetStateInfo();
+        curState[deviceId] = devState;
+    }
+    camDump.curState = curState;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

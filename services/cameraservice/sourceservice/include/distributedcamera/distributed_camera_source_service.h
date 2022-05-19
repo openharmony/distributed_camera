@@ -19,10 +19,12 @@
 #include <memory>
 #include <mutex>
 #include <map>
+#include <vector>
 
 #include "system_ability.h"
 #include "ipc_object_stub.h"
 
+#include "dcamera_source_hidumper.h"
 #include "dcamera_index.h"
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_dev.h"
@@ -45,6 +47,8 @@ public:
     int32_t UnregisterDistributedHardware(const std::string& devId, const std::string& dhId,
         const std::string& reqId) override;
     int32_t DCameraNotify(const std::string& devId, const std::string& dhId, std::string& events) override;
+    int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    static void GetDumpInfo(CameraDumpInfo& camDump);
 
     static std::map<DCameraIndex, std::shared_ptr<DCameraSourceDev>> camerasMap_;
 

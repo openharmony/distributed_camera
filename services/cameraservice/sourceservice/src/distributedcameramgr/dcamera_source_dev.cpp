@@ -568,5 +568,16 @@ void DCameraSourceDev::NotifyHalResult(DCAMERA_EVENT eventType, DCameraSourceEve
     ExecuteCameraEventNotify(events);
     return;
 }
+
+int32_t DCameraSourceDev::GetStateInfo()
+{
+    DHLOGI("GetStateInfo In state %d", stateMachine_->GetCameraState());
+    return stateMachine_->GetCameraState();
+}
+
+std::string DCameraSourceDev::GetVersion()
+{
+    return version_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
