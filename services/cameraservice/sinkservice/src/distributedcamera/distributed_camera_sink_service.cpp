@@ -97,7 +97,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params)
         DHLOGE("DistributedCameraSinkService::InitSink no camera device");
         return DCAMERA_BAD_VALUE;
     }
-    g_camDump.camNumber = cameras.size();
+    g_camDump.camNumber = static_cast<int32_t>(cameras.size());
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId);
         ret = sinkDevice->Init();

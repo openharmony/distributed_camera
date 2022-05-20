@@ -238,7 +238,7 @@ int DistributedCameraSourceService::Dump(int32_t fd, const std::vector<std::u16s
 
 void DistributedCameraSourceService::GetDumpInfo(CameraDumpInfo& camDump)
 {
-    camDump.regNumber = camerasMap_.size();
+    camDump.regNumber = static_cast<int32_t>(camerasMap_.size());
     std::map<std::string, int32_t> curState;
     for (auto it = camerasMap_.begin(); it != camerasMap_.end(); it++) {
         DCameraIndex cam = it->first;
