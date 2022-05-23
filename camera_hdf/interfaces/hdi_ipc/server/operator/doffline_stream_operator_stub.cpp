@@ -98,7 +98,7 @@ int32_t DOfflineStreamOperatorStub::DOfflineStreamOperatorStubRelease(MessagePar
 
     CamRetCode ret = Release();
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        DHLOGE("%s: write retcode failed.");
+        DHLOGE("write retcode failed.");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
