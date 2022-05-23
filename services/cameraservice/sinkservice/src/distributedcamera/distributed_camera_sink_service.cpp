@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ int32_t DistributedCameraSinkService::InitSink(const std::string& params)
         DHLOGE("DistributedCameraSinkService::InitSink no camera device");
         return DCAMERA_BAD_VALUE;
     }
-    g_camDump.camNumber = cameras.size();
+    g_camDump.camNumber = static_cast<int32_t>(cameras.size());
     for (auto& dhId : cameras) {
         std::shared_ptr<DCameraSinkDev> sinkDevice = std::make_shared<DCameraSinkDev>(dhId);
         ret = sinkDevice->Init();
