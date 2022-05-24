@@ -15,7 +15,10 @@
 
 #include "dcamera_sink_handler.h"
 
+#include <unistd.h>
+
 #include "anonymous_string.h"
+#include "hisysevent.h"
 #include "dcamera_sink_handler_ipc.h"
 #include "dcamera_sink_load_callback.h"
 #include "distributed_camera_constants.h"
@@ -40,6 +43,16 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
     if (sm == nullptr) {
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
+    }
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "INIT_SA_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "init sink sa event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
     }
     sptr<DCameraSinkLoadCallback> loadCallback = new DCameraSinkLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, loadCallback);
@@ -89,6 +102,17 @@ int32_t DCameraSinkHandler::ReleaseSink()
     if (dCameraSinkSrv == nullptr) {
         DHLOGE("DCameraSinkHandler::ReleaseSink get Service failed");
         return DCAMERA_BAD_VALUE;
+    }
+
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "RELEASE_SA_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "release sink sa event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
     }
 
     int32_t ret = dCameraSinkSrv->ReleaseSink();

@@ -15,7 +15,10 @@
 
 #include "dcamera_source_dev.h"
 
+#include <unistd.h>
+
 #include "anonymous_string.h"
+#include "hisysevent.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -215,6 +218,16 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
 {
     DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "REGIST_CAMERA_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute register event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     std::vector<DCameraIndex> actualDevInfo;
     actualDevInfo.assign(actualDevInfo_.begin(), actualDevInfo_.end());
     int32_t ret = controller_->Init(actualDevInfo);
@@ -258,6 +271,16 @@ int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>&
 {
     DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "UNREGIST_CAMERA_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute unregister event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = controller_->UnInit();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute UnRegister controller uninit failed, ret: %d, devId: %s dhId: %s", ret,
@@ -293,6 +316,16 @@ int32_t DCameraSourceDev::ExecuteOpenCamera()
 {
     DHLOGI("DCameraSourceDev Execute OpenCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "OPEN_CAMERA_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute open camera event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     if (ret != DCAMERA_OK) {
@@ -314,6 +347,16 @@ int32_t DCameraSourceDev::ExecuteCloseCamera()
 {
     DHLOGI("DCameraSourceDev Execute CloseCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "CLOSE_CAMERA_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute close camera event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = input_->CloseChannel();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute CloseCamera input CloseChannel failed, ret: %d, devId: %s dhId: %s", ret,
@@ -331,6 +374,16 @@ int32_t DCameraSourceDev::ExecuteConfigStreams(std::vector<std::shared_ptr<DCStr
 {
     DHLOGI("DCameraSourceDev Execute ConfigStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "CONFIG_STREAMS_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute config streams event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = input_->ConfigStreams(streamInfos);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute ConfigStreams ConfigStreams failed, ret: %d, devId: %s dhId: %s", ret,
@@ -372,6 +425,16 @@ int32_t DCameraSourceDev::ExecuteReleaseStreams(std::vector<int>& streamIds, boo
 {
     DHLOGI("DCameraSourceDev Execute ReleaseStreams devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "RELEASE_STREAMS_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute release streams event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = input_->ReleaseStreams(streamIds, isAllRelease);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute ReleaseStreams failed ret: %d, devId: %s, dhId: %s", ret,
@@ -398,6 +461,16 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
 {
     DHLOGI("DCameraSourceDev Execute StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "START_CAPTURE_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute start capture event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = input_->StartCapture(captureInfos);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev input StartCapture failed ret: %d, devId: %s, dhId: %s", ret,
@@ -440,6 +513,16 @@ int32_t DCameraSourceDev::ExecuteStopCapture(std::vector<int>& streamIds, bool& 
 {
     DHLOGI("DCameraSourceDev Execute StopCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "STOP_CAPTURE_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "execute stop capture event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = input_->StopCapture(streamIds, isAllStop);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StopCapture input StopCapture failed, ret: %d, devId: %s dhId: %s", ret,

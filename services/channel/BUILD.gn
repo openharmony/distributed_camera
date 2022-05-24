@@ -52,6 +52,7 @@ ohos_shared_library("distributed_camera_channel") {
   ]
 
   external_deps = [
+    "hisysevent_native:libhisysevent",
     "dsoftbus_standard:softbus_client",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",

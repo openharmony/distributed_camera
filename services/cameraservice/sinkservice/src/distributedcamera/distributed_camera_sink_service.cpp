@@ -15,6 +15,9 @@
 
 #include "distributed_camera_sink_service.h"
 
+#include <unistd.h>
+
+#include "hisysevent.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -235,6 +238,16 @@ int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::
     int32_t ret = sinkDevice->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSinkService::OpenChannel failed, ret: %d", ret);
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "CAMERA_OPERATER_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "sink service open channel failed.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
         return ret;
     }
     DHLOGI("DistributedCameraSinkService::OpenChannel success");

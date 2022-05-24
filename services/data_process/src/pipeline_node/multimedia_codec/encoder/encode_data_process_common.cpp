@@ -15,11 +15,13 @@
 
 #include "encode_data_process.h"
 
-#include<cmath>
+#include <cmath>
+#include <unistd.h>
 
 #include "display_type.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
+#include "hisysevent.h"
 
 #include "dcamera_utils_tools.h"
 #include "encode_video_callback.h"
@@ -227,6 +229,16 @@ int32_t EncodeDataProcess::StartVideoEncoder()
     ret = videoEncoder_->Start();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("Video encoder start failed. Error code %d.", ret);
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "VIDEO_ENCODER_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "video encoder start failed.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
         return DCAMERA_INIT_ERR;
     }
     return DCAMERA_OK;
@@ -248,6 +260,16 @@ int32_t EncodeDataProcess::StopVideoEncoder()
     ret = videoEncoder_->Stop();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {
         DHLOGE("VideoEncoder stop failed. Error type: %d.", ret);
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "VIDEO_ENCODER_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "video encoder stop failed.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
         isSuccess = isSuccess && false;
     }
 

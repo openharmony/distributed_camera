@@ -15,6 +15,9 @@
 
 #include "distributed_camera_source_service.h"
 
+#include <unistd.h>
+
+#include "hisysevent.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
@@ -87,6 +90,16 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
     const sptr<IDCameraSourceCallback>& callback)
 {
     DHLOGI("DistributedCameraSourceService InitSource param: %s", params.c_str());
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "LOAD_HDF_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "load dcamera hdf event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = LoadDCameraHDF();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %d", ret);
@@ -100,6 +113,16 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
 int32_t DistributedCameraSourceService::ReleaseSource()
 {
     DHLOGI("DistributedCameraSourceService ReleaseSource");
+    int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+        "UNLOAD_HDF_EVENT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PID", getpid(),
+        "UID", getuid(),
+        "MSG", "unload dcamera hdf event.");
+    if (retVal != DCAMERA_OK) {
+        DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+    }
     int32_t ret = UnLoadCameraHDF();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);
@@ -143,6 +166,16 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed, ret: %d", ret);
         camerasMap_.erase(camIndex);
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "REGISTER_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "dcamera source RegisterDistributedHardware fail.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
     }
     DHLOGI("DistributedCameraSourceService RegisterDistributedHardware end devId: %s, dhId: %s, version: %s",
         GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str(), param.version.c_str());
@@ -195,6 +228,16 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
         DHLOGE("load hdf driver failed, ret %d", ret);
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "HDF_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "dcamera load hdf driver fail.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
         return ret;
     }
     DHLOGI("load hdf driver end");
@@ -207,6 +250,16 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
     int32_t ret = DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
         DHLOGE("unload hdf driver failed, ret %d", ret);
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "HDF_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "dcamera unload hdf driver fail.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
         return ret;
     }
     DHLOGI("unload hdf driver end");

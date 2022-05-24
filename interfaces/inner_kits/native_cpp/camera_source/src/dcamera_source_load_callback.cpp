@@ -12,10 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "dcamera_source_load_callback.h"
+
+#include <unistd.h>
+
+#include "hisysevent.h"
 #include "dcamera_source_handler.h"
 #include "distributed_hardware_log.h"
 #include "distributed_camera_constants.h"
+#include "distributed_camera_errno.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,6 +47,16 @@ void DCameraSourceLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
     DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
+        int32_t retVal = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_CAMERA,
+            "SA_ERROR",
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            "PID", getpid(),
+            "UID", getuid(),
+            "MSG", "dcamera source OnLoadSystemAbilityFail.");
+        if (retVal != DCAMERA_OK) {
+            DHLOGE("Write HiSysEvent error, retVal:%d", retVal);
+        }
         return;
     }
     DCameraSourceHandler::GetInstance().FinishStartSAFailed(systemAbilityId);
