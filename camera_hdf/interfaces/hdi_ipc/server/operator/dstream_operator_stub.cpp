@@ -336,7 +336,7 @@ int32_t DStreamOperatorStub::DStreamOperatorStubChangeToOfflineStream(MessagePar
     OHOS::sptr<IOfflineStreamOperator> offlineOperator = nullptr;
     CamRetCode ret = ChangeToOfflineStream(streamIds, spStreamOperatorCallback, offlineOperator);
     if (!reply.WriteInt32(static_cast<int32_t>(ret))) {
-        DHLOGE("%s: write retcode failed.");
+        DHLOGE("write retcode failed.");
         return HDF_FAILURE;
     }
 
