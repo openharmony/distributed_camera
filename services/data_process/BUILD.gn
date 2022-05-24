@@ -20,8 +20,8 @@ ohos_shared_library("distributed_camera_data_process") {
   include_dirs = [
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
-    "//foundation/graphic/graphic/interfaces/innerkits/common",
-    "//foundation/graphic/graphic/interfaces/innerkits/surface",
+    "//foundation/graphic/graphic_2d/interfaces/innerkits/common",
+    "//foundation/graphic/graphic_2d/interfaces/innerkits/surface",
     "//drivers/peripheral/display/interfaces/include",
     "//foundation/multimedia/media_standard/interfaces/innerkits/native/media/include",
     "${fwk_common_path}/log/include",
@@ -72,7 +72,7 @@ ohos_shared_library("distributed_camera_data_process") {
   deps = [
     "${common_path}:distributed_camera_utils",
     "${fwk_utils_path}:distributedhardwareutils",
-    "//foundation/graphic/graphic/frameworks/surface:surface",
+    "//foundation/graphic/graphic_2d/frameworks/surface:surface",
     "//utils/native/base:utils",
   ]
 
