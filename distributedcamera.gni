@@ -26,7 +26,7 @@ camerastandard_path = "//foundation/multimedia/camera_standard"
 
 mediastandard_path = "//foundation/multimedia/media_standard"
 
-graphicstandard_path = "//foundation/graphic/graphic"
+graphicstandard_path = "//foundation/graphic/graphic_2d"
 
 common_path = "${distributedcamera_path}/common"
 
