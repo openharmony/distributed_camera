@@ -75,9 +75,6 @@ int32_t DCameraSinkController::StopCapture()
 {
     DHLOGI("DCameraSinkController::StopCapture dhId: %s", GetAnonyString(dhId_).c_str());
     std::lock_guard<std::mutex> autoLock(captureLock_);
-    if (operator_ == nullptr) {
-        DHLOGI("DCameraSinkController::StopCapture *** operator_ is null");
-    }
     int32_t ret = operator_->StopCapture();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StopCapture client stop capture failed, dhId: %s, ret: %d",
