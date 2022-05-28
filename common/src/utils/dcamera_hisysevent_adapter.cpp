@@ -65,7 +65,7 @@ void ReportRegisterHardwareFail(const std::string& devId, const std::string& dhI
     }
 }
 
-void ReportSoftbusSessionServerFail(const std::string pkgName, std::string sessionName, const std::string& errMsg)
+void ReportSoftbusSessionServerFail(const std::string& pkgName, std::string sessionName, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         "SOFTBUS_SESSIONSERVER_ERROR",

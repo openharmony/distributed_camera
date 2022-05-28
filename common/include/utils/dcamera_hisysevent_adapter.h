@@ -24,7 +24,7 @@ void ReportLoadSaFail(int32_t saId, const std::string& errMsg);
 void ReportHDFFail(const std::string& errMsg);
 void ReportRegisterHardwareFail(const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg);
-void ReportSoftbusSessionServerFail(const std::string pkgName, std::string sessionName, const std::string& errMsg);
+void ReportSoftbusSessionServerFail(const std::string& pkgName, std::string sessionName, const std::string& errMsg);
 void ReportSoftbusSessionFail(std::string mySessName, std::string peerSessName, std::string peerDevId,
     const std::string& errMsg);
 void ReportCameraOperaterFail(const std::string& dhId, const std::string& errMsg);
