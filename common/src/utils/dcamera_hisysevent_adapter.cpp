@@ -24,6 +24,12 @@ namespace DistributedHardware {
 namespace {
 using HiSysEventNameSpace = OHOS::HiviewDFX::HiSysEvent;
 const std::string DOMAIN_STR = std::string(HiSysEventNameSpace::Domain::DISTRIBUTED_CAMERA);
+const std::string ENUM_STREAMTYPE_STRINGS[] = {
+    "CONTINUOUS_FRAME", "SNAPSHOT_FRAME"
+};
+const std::string ENUM_ENCODETYPE_STRINGS[] = {
+    "ENCODE_TYPE_NULL", "ENCODE_TYPE_H264", "ENCODE_TYPE_H265", "ENCODE_TYPE_JPEG"
+};
 }
 
 void ReportLoadSaFail(int32_t saId, const std::string& errMsg)
@@ -254,18 +260,17 @@ void ReportCloseCameraEvent(const std::string& devId, const std::string& dhId, c
     }
 }
 
-void ReportConfigStreamsEvent(int32_t streamId, int32_t width, int32_t height, int32_t format,
-    std::string encodeType, std::string streamType, const std::string& errMsg)
+void ReportConfigStreamsEvent(EventStreamInfo& streamInfo, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         "CONFIG_STREAMS_EVENT",
         HiSysEventNameSpace::EventType::BEHAVIOR,
-        "STREAMID", streamId,
-        "WIDTH", width,
-        "HEIGHT", height,
-        "FORMAT", format,
-        "ENCODETYPE", encodeType,
-        "STREAMTYPE", streamType,
+        "STREAMID", streamInfo.streamId_,
+        "WIDTH", streamInfo.width_,
+        "HEIGHT", streamInfo.height_,
+        "FORMAT", streamInfo.format_,
+        "ENCODETYPE", ENUM_ENCODETYPE_STRINGS[streamInfo.encodeType_],
+        "STREAMTYPE", ENUM_STREAMTYPE_STRINGS[streamInfo.type_],
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
         DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
@@ -284,18 +289,17 @@ void ReportReleaseStreamsEvent(int32_t streamId, const std::string& errMsg)
     }
 }
 
-void ReportStartCaptureEvent(int32_t width, int32_t height, int32_t format, std::string isCapture,
-    std::string encodeType, std::string streamType, const std::string& errMsg)
+void ReportStartCaptureEvent(EventCaptureInfo& capture, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
         "START_CAPTURE_EVENT",
         HiSysEventNameSpace::EventType::BEHAVIOR,
-        "WIDTH", width,
-        "HEIGHT", height,
-        "FORMAT", format,
-        "ISCAPTURE", isCapture,
-        "ENCODETYPE", encodeType,
-        "STREAMTYPE", streamType,
+        "WIDTH", capture.width_,
+        "HEIGHT", capture.height_,
+        "FORMAT", capture.format_,
+        "ISCAPTURE", capture.isCapture_ ? "true" : "false",
+        "ENCODETYPE", ENUM_ENCODETYPE_STRINGS[capture.encodeType_],
+        "STREAMTYPE", ENUM_STREAMTYPE_STRINGS[capture.type_],
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
         DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());

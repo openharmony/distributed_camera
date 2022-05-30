@@ -30,13 +30,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const string ENUM_STREAMTYPE_STRINGS[] = {
-    "CONTINUOUS_FRAME", "SNAPSHOT_FRAME"
-};
-const string ENUM_ENCODETYPE_STRINGS[] = {
-    "ENCODE_TYPE_NULL", "ENCODE_TYPE_H264", "ENCODE_TYPE_H265", "ENCODE_TYPE_JPEG"
-};
-
 DCameraSourceDev::DCameraSourceDev(std::string devId, std::string dhId,
     std::shared_ptr<ICameraStateListener>& stateLisener) : devId_(devId), dhId_(dhId), stateListener_(stateLisener)
 {
@@ -345,9 +338,15 @@ int32_t DCameraSourceDev::ExecuteConfigStreams(std::vector<std::shared_ptr<DCStr
         GetAnonyString(dhId_).c_str());
     for (auto iter = streamInfos.begin(); iter != streamInfos.end(); iter++) {
         std::shared_ptr<DCStreamInfo> streamInfo = *iter;
-        ReportConfigStreamsEvent(streamInfo->streamId_, streamInfo->width_, streamInfo->height_, streamInfo->format_,
-            ENUM_ENCODETYPE_STRINGS[streamInfo->encodeType_], ENUM_STREAMTYPE_STRINGS[streamInfo->type_],
-            "execute config streams event.");
+        EventStreamInfo eventStreamInfo = {
+            .streamId_ = streamInfo->streamId_,
+            .width_ = streamInfo->width_,
+            .height_ = streamInfo->height_,
+            .format_ = streamInfo->format_,
+            .encodeType_ = streamInfo->encodeType_,
+            .type_ = streamInfo->type_,
+        };
+        ReportConfigStreamsEvent(eventStreamInfo, "execute config streams event.");
     }
     int32_t ret = input_->ConfigStreams(streamInfos);
     if (ret != DCAMERA_OK) {
@@ -439,9 +438,15 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(),
             capture->width_, capture->height_, capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_,
             capture->streamType_);
-        ReportStartCaptureEvent(capture->width_, capture->height_, capture->format_,
-            capture->isCapture_ ? "true" : "false", ENUM_ENCODETYPE_STRINGS[capture->encodeType_],
-            ENUM_STREAMTYPE_STRINGS[capture->streamType_], "execute start capture event.");
+        EventCaptureInfo eventCaptureInfo = {
+            .width_ = capture->width_,
+            .height_ = capture->height_,
+            .format_ = capture->format_,
+            .isCapture_ = capture->isCapture_,
+            .encodeType_ = capture->encodeType_,
+            .type_ = capture->streamType_,
+        };
+        ReportStartCaptureEvent(eventCaptureInfo, "execute start capture event.");
         for (auto settingIter = (*iter)->captureSettings_.begin(); settingIter != (*iter)->captureSettings_.end();
             settingIter++) {
             std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();

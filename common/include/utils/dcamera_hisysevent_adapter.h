@@ -20,6 +20,24 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+using EventStreamInfo = struct _EventStreamInfo {
+    int32_t streamId_;
+    int32_t width_;
+    int32_t height_;
+    int32_t format_;
+    int32_t encodeType_;
+    int32_t type_;
+};
+
+using EventCaptureInfo = struct _EventCaptureInfo {
+    int32_t width_;
+    int32_t height_;
+    int32_t format_;
+    bool isCapture_;
+    int32_t encodeType_;
+    int32_t type_;
+};
+
 void ReportLoadSaFail(int32_t saId, const std::string& errMsg);
 void ReportHDFFail(const std::string& errMsg);
 void ReportRegisterHardwareFail(const std::string& devId, const std::string& dhId,
@@ -41,11 +59,9 @@ void ReportRegisterCameraEvent(const std::string& devId, const std::string& dhId
 void ReportUnRegisterCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg);
 void ReportOpenCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg);
 void ReportCloseCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg);
-void ReportConfigStreamsEvent(int32_t streamId, int32_t width, int32_t height, int32_t format,
-    std::string encodeType, std::string streamType, const std::string& errMsg);
+void ReportConfigStreamsEvent(EventStreamInfo& streamInfo, const std::string& errMsg);
 void ReportReleaseStreamsEvent(int32_t streamId, const std::string& errMsg);
-void ReportStartCaptureEvent(int32_t width, int32_t height, int32_t format, std::string isCapture,
-    std::string encodeType, std::string streamType, const std::string& errMsg);
+void ReportStartCaptureEvent(EventCaptureInfo& capture, const std::string& errMsg);
 void ReportStopCaptureEvent(int32_t streamId, const std::string& errMsg);
 } // namespace DistributedHardware
 } // namespace OHOS
