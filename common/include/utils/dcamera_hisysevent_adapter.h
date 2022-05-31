@@ -50,15 +50,13 @@ void ReportStartVideoEncoderFail(int32_t width, int32_t height, std::string form
 void ReportStopVideoEncoderFail(const std::string& errMsg);
 void ReportStartVideoDecoderFail(int32_t width, int32_t height, std::string format, const std::string& errMsg);
 void ReportStopVideoDecoderFail(const std::string& errMsg);
-void ReportInitSaEvent(int32_t saId, const std::string& errMsg);
-void ReportReleaseSaEvent(const std::string& errMsg);
-void ReportLoadHDFEvent(const std::string& errMsg);
-void ReportUnLoadHDFEvent(const std::string& errMsg);
-void ReportRegisterCameraEvent(const std::string& devId, const std::string& dhId,
+
+void ReportSaEvent(const std::string eventName, int32_t saId, const std::string& errMsg);
+void ReportHDFEvent(const std::string eventName, const std::string& errMsg);
+void ReportRegisterCameraEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg);
-void ReportUnRegisterCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg);
-void ReportOpenCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg);
-void ReportCloseCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg);
+void ReportCameraOperaterEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
+    const std::string& errMsg);
 void ReportConfigStreamsEvent(EventStreamInfo& streamInfo, const std::string& errMsg);
 void ReportReleaseStreamsEvent(int32_t streamId, const std::string& errMsg);
 void ReportStartCaptureEvent(EventCaptureInfo& capture, const std::string& errMsg);

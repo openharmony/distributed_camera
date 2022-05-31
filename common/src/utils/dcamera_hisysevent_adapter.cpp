@@ -161,10 +161,10 @@ void ReportStopVideoDecoderFail(const std::string& errMsg)
     }
 }
 
-void ReportInitSaEvent(int32_t saId, const std::string& errMsg)
+void ReportSaEvent(const std::string eventName, int32_t saId, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "INIT_SA_EVENT",
+        eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "SAID", saId,
         "MSG", errMsg);
@@ -173,10 +173,10 @@ void ReportInitSaEvent(int32_t saId, const std::string& errMsg)
     }
 }
 
-void ReportReleaseSaEvent(const std::string& errMsg)
+void ReportHDFEvent(const std::string eventName, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "RELEASE_SA_EVENT",
+        eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
@@ -184,33 +184,11 @@ void ReportReleaseSaEvent(const std::string& errMsg)
     }
 }
 
-void ReportLoadHDFEvent(const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "LOAD_HDF_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportUnLoadHDFEvent(const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "UNLOAD_HDF_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportRegisterCameraEvent(const std::string& devId, const std::string& dhId,
+void ReportRegisterCameraEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "REGIST_CAMERA_EVENT",
+        eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "DEVID", devId,
         "DHID", dhId,
@@ -221,36 +199,11 @@ void ReportRegisterCameraEvent(const std::string& devId, const std::string& dhId
     }
 }
 
-void ReportUnRegisterCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg)
+void ReportCameraOperaterEvent(const std::string eventName, const std::string& devId, const std::string& dhId,
+    const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "UNREGIST_CAMERA_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "DEVID", devId,
-        "DHID", dhId,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportOpenCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "OPEN_CAMERA_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "DEVID", devId,
-        "DHID", dhId,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportCloseCameraEvent(const std::string& devId, const std::string& dhId, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "CLOSE_CAMERA_EVENT",
+        eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "DEVID", devId,
         "DHID", dhId,

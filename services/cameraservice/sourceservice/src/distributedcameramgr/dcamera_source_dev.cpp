@@ -216,7 +216,8 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
 {
     DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
-    ReportRegisterCameraEvent(GetAnonyString(devId_), dhId_, version_, "execute register event.");
+    ReportRegisterCameraEvent("REGIST_CAMERA_EVENT", GetAnonyString(devId_), dhId_,
+        version_, "execute register event.");
     std::vector<DCameraIndex> actualDevInfo;
     actualDevInfo.assign(actualDevInfo_.begin(), actualDevInfo_.end());
     int32_t ret = controller_->Init(actualDevInfo);
@@ -260,7 +261,8 @@ int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>&
 {
     DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    ReportUnRegisterCameraEvent(GetAnonyString(devId_), dhId_, "execute unregister event.");
+    ReportRegisterCameraEvent("UNREGIST_CAMERA_EVENT", GetAnonyString(devId_), dhId_,
+        version_, "execute unregister event.");
     int32_t ret = controller_->UnInit();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute UnRegister controller uninit failed, ret: %d, devId: %s dhId: %s", ret,
@@ -296,7 +298,7 @@ int32_t DCameraSourceDev::ExecuteOpenCamera()
 {
     DHLOGI("DCameraSourceDev Execute OpenCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    ReportOpenCameraEvent(GetAnonyString(devId_), dhId_, "execute open camera event.");
+    ReportCameraOperaterEvent("OPEN_CAMERA_EVENT", GetAnonyString(devId_), dhId_, "execute open camera event.");
     std::shared_ptr<DCameraOpenInfo> openInfo = std::make_shared<DCameraOpenInfo>();
     int32_t ret = GetLocalDeviceNetworkId(openInfo->sourceDevId_);
     if (ret != DCAMERA_OK) {
@@ -318,7 +320,7 @@ int32_t DCameraSourceDev::ExecuteCloseCamera()
 {
     DHLOGI("DCameraSourceDev Execute CloseCamera devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
-    ReportCloseCameraEvent(GetAnonyString(devId_), dhId_, "execute close camera event.");
+    ReportCameraOperaterEvent("CLOSE_CAMERA_EVENT", GetAnonyString(devId_), dhId_, "execute close camera event.");
     int32_t ret = input_->CloseChannel();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute CloseCamera input CloseChannel failed, ret: %d, devId: %s dhId: %s", ret,

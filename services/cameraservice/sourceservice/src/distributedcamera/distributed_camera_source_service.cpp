@@ -88,7 +88,7 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
     const sptr<IDCameraSourceCallback>& callback)
 {
     DHLOGI("DistributedCameraSourceService InitSource param: %s", params.c_str());
-    ReportLoadHDFEvent("load dcamera hdf event.");
+    ReportHDFEvent("LOAD_HDF_EVENT", "load dcamera hdf event.");
     int32_t ret = LoadDCameraHDF();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %d", ret);
@@ -102,7 +102,7 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
 int32_t DistributedCameraSourceService::ReleaseSource()
 {
     DHLOGI("DistributedCameraSourceService ReleaseSource");
-    ReportUnLoadHDFEvent("unload dcamera hdf event.");
+    ReportHDFEvent("UNLOAD_HDF_EVENT", "unload dcamera hdf event.");
     int32_t ret = UnLoadCameraHDF();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);

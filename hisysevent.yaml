@@ -102,6 +102,7 @@ INIT_SA_EVENT:
 
 RELEASE_SA_EVENT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: dcamera release sa event}
+  SAID: {type: INT32, desc: dcamera SAID}
   MSG: {type: STRING, desc: dcamera release sa event}
 
 LOAD_HDF_EVENT:
@@ -123,6 +124,7 @@ UNREGIST_CAMERA_EVENT:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: dcamera unregister event}
   DEVID: {type: STRING, desc: dcamera devId}
   DHID: {type: STRING, desc: dcamera dhId}
+  VERSION: {type: STRING, desc: dcamera version}
   MSG: {type: STRING, desc: dcamera unregister event}
  
 OPEN_CAMERA_EVENT:

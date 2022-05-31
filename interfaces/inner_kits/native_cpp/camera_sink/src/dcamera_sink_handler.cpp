@@ -42,7 +42,7 @@ int32_t DCameraSinkHandler::InitSink(const std::string& params)
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
-    ReportInitSaEvent(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, "init sink sa event.");
+    ReportSaEvent("INIT_SA_EVENT", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, "init sink sa event.");
     sptr<DCameraSinkLoadCallback> loadCallback = new DCameraSinkLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
@@ -93,7 +93,7 @@ int32_t DCameraSinkHandler::ReleaseSink()
         return DCAMERA_BAD_VALUE;
     }
 
-    ReportReleaseSaEvent("release sink sa event.");
+    ReportSaEvent("RELEASE_SA_EVENT", DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID, "release sink sa event.");
     int32_t ret = dCameraSinkSrv->ReleaseSink();
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkHandler::ReleaseSink sink service release failed, ret: %d", ret);
