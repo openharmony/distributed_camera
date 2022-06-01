@@ -88,7 +88,6 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
     const sptr<IDCameraSourceCallback>& callback)
 {
     DHLOGI("DistributedCameraSourceService InitSource param: %s", params.c_str());
-    ReportHDFEvent("LOAD_HDF_EVENT", "load dcamera hdf event.");
     int32_t ret = LoadDCameraHDF();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService InitSource LoadHDF failed, ret: %d", ret);
@@ -102,7 +101,6 @@ int32_t DistributedCameraSourceService::InitSource(const std::string& params,
 int32_t DistributedCameraSourceService::ReleaseSource()
 {
     DHLOGI("DistributedCameraSourceService ReleaseSource");
-    ReportHDFEvent("UNLOAD_HDF_EVENT", "unload dcamera hdf event.");
     int32_t ret = UnLoadCameraHDF();
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService ReleaseSource UnLoadHDF failed, ret: %d", ret);
@@ -145,7 +143,7 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed, ret: %d", ret);
-        ReportRegisterHardwareFail(GetAnonyString(devId), dhId, param.version,
+        ReportRegisterCameraFail(REGISTER_CAMERA_ERROR, GetAnonyString(devId), dhId, param.version,
             "dcamera source RegisterDistributedHardware fail.");
         camerasMap_.erase(camIndex);
     }
@@ -200,7 +198,7 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
         DHLOGE("load hdf driver failed, ret %d", ret);
-        ReportHDFFail("dcamera load hdf driver fail.");
+        ReportStartHDFFail(HDF_ERROR, "dcamera load hdf driver fail.");
         return ret;
     }
     DHLOGI("load hdf driver end");
@@ -213,7 +211,6 @@ int32_t DistributedCameraSourceService::UnLoadCameraHDF()
     int32_t ret = DCameraHdfOperate::GetInstance().UnLoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
         DHLOGE("unload hdf driver failed, ret %d", ret);
-        ReportHDFFail("dcamera unload hdf driver fail.");
         return ret;
     }
     DHLOGI("unload hdf driver end");

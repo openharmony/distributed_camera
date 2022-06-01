@@ -111,7 +111,7 @@ int32_t DecodeDataProcess::InitDecoder()
     ret = StartVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video decoder failed.");
-        ReportStartVideoDecoderFail(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+        ReportStartVideoDecoderFail(START_VIDEO_DECODER_ERROR, sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
             ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
             "start video decoder failed.");
         return ret;
@@ -270,7 +270,6 @@ void DecodeDataProcess::ReleaseVideoDecoder()
     int32_t ret = StopVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoDecoder failed.");
-        ReportStopVideoDecoderFail("stop video decoder failed.");
     }
     ret = videoDecoder_->Release();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {

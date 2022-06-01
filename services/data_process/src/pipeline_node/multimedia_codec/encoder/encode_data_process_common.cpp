@@ -116,7 +116,7 @@ int32_t EncodeDataProcess::InitEncoder()
     ret = StartVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video encoder failed.");
-        ReportStartVideoEncoderFail(sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+        ReportStartVideoEncoderFail(START_VIDEO_ENCODER_ERROR, sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
             ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
             "start video encoder failed.");
         return ret;
@@ -278,7 +278,6 @@ void EncodeDataProcess::ReleaseVideoEncoder()
     int32_t ret = StopVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("StopVideoEncoder failed.");
-        ReportStopVideoEncoderFail("stop video encoder failed.");
     }
     ret = videoEncoder_->Release();
     if (ret != Media::MediaServiceErrCode::MSERR_OK) {

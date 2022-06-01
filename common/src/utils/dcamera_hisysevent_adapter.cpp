@@ -32,10 +32,10 @@ const std::string ENUM_ENCODETYPE_STRINGS[] = {
 };
 }
 
-void ReportLoadSaFail(int32_t saId, const std::string& errMsg)
+void ReportStartSaFail(const std::string eventName, int32_t saId, const std::string& errMsg)
 {
     int ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "SA_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "SAID", saId,
         "MSG", errMsg);
@@ -44,10 +44,10 @@ void ReportLoadSaFail(int32_t saId, const std::string& errMsg)
     }
 }
 
-void ReportHDFFail(const std::string& errMsg)
+void ReportStartHDFFail(const std::string eventName, const std::string& errMsg)
 {
     int ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "HDF_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
@@ -55,11 +55,11 @@ void ReportHDFFail(const std::string& errMsg)
     }
 }
 
-void ReportRegisterHardwareFail(const std::string& devId, const std::string& dhId,
+void ReportRegisterCameraFail(const std::string eventName, const std::string& devId, const std::string& dhId,
     std::string version, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "REGISTER_HARDWARE_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "DEVID", devId,
         "DHID", dhId,
@@ -71,10 +71,11 @@ void ReportRegisterHardwareFail(const std::string& devId, const std::string& dhI
     }
 }
 
-void ReportSoftbusSessionServerFail(const std::string& pkgName, std::string sessionName, const std::string& errMsg)
+void ReportSoftbusSessionServerFail(const std::string eventName, const std::string& pkgName,
+    std::string sessionName, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "SOFTBUS_SESSIONSERVER_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "PKGNAME", pkgName,
         "SESSIONNAME", sessionName,
@@ -84,11 +85,11 @@ void ReportSoftbusSessionServerFail(const std::string& pkgName, std::string sess
     }
 }
 
-void ReportSoftbusSessionFail(std::string mySessName, std::string peerSessName, std::string peerDevId,
-    const std::string& errMsg)
+void ReportSoftbusSessionFail(const std::string eventName, std::string mySessName,
+    std::string peerSessName, std::string peerDevId, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "SOFTBUS_SESSION_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "MYSESSIONNAME", mySessName,
         "PEERSESSIONNAME", peerSessName,
@@ -99,10 +100,10 @@ void ReportSoftbusSessionFail(std::string mySessName, std::string peerSessName, 
     }
 }
 
-void ReportCameraOperaterFail(const std::string& dhId, const std::string& errMsg)
+void ReportSinkOpenCamFail(const std::string eventName, const std::string& dhId, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "CAMERA_OPERATER_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "DHID", dhId,
         "MSG", errMsg);
@@ -111,10 +112,11 @@ void ReportCameraOperaterFail(const std::string& dhId, const std::string& errMsg
     }
 }
 
-void ReportStartVideoEncoderFail(int32_t width, int32_t height, std::string format, const std::string& errMsg)
+void ReportStartVideoEncoderFail(const std::string eventName, int32_t width, int32_t height,
+    std::string format, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "START_VIDEO_ENCODER_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "WIDTH", width,
         "HEIGHT", height,
@@ -125,36 +127,15 @@ void ReportStartVideoEncoderFail(int32_t width, int32_t height, std::string form
     }
 }
 
-void ReportStopVideoEncoderFail(const std::string& errMsg)
+void ReportStartVideoDecoderFail(const std::string eventName, int32_t width, int32_t height,
+    std::string format, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "STOP_VIDEO_ENCODER_ERROR",
-        HiSysEventNameSpace::EventType::FAULT,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportStartVideoDecoderFail(int32_t width, int32_t height, std::string format, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "START_VIDEO_DECODER_ERROR",
+        eventName,
         HiSysEventNameSpace::EventType::FAULT,
         "WIDTH", width,
         "HEIGHT", height,
         "FORMAT", format,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportStopVideoDecoderFail(const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "STOP_VIDEO_DECODER_ERROR",
-        HiSysEventNameSpace::EventType::FAULT,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
         DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
@@ -167,17 +148,6 @@ void ReportSaEvent(const std::string eventName, int32_t saId, const std::string&
         eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "SAID", saId,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportHDFEvent(const std::string eventName, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        eventName,
-        HiSysEventNameSpace::EventType::BEHAVIOR,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
         DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
@@ -213,39 +183,10 @@ void ReportCameraOperaterEvent(const std::string eventName, const std::string& d
     }
 }
 
-void ReportConfigStreamsEvent(EventStreamInfo& streamInfo, const std::string& errMsg)
+void ReportStartCaptureEvent(const std::string eventName, EventCaptureInfo& capture, const std::string& errMsg)
 {
     int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "CONFIG_STREAMS_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "STREAMID", streamInfo.streamId_,
-        "WIDTH", streamInfo.width_,
-        "HEIGHT", streamInfo.height_,
-        "FORMAT", streamInfo.format_,
-        "ENCODETYPE", ENUM_ENCODETYPE_STRINGS[streamInfo.encodeType_],
-        "STREAMTYPE", ENUM_STREAMTYPE_STRINGS[streamInfo.type_],
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportReleaseStreamsEvent(int32_t streamId, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "RELEASE_STREAMS_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "STREAMID", streamId,
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportStartCaptureEvent(EventCaptureInfo& capture, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "START_CAPTURE_EVENT",
+        eventName,
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "WIDTH", capture.width_,
         "HEIGHT", capture.height_,
@@ -253,18 +194,6 @@ void ReportStartCaptureEvent(EventCaptureInfo& capture, const std::string& errMs
         "ISCAPTURE", capture.isCapture_ ? "true" : "false",
         "ENCODETYPE", ENUM_ENCODETYPE_STRINGS[capture.encodeType_],
         "STREAMTYPE", ENUM_STREAMTYPE_STRINGS[capture.type_],
-        "MSG", errMsg);
-    if (ret != DCAMERA_OK) {
-        DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());
-    }
-}
-
-void ReportStopCaptureEvent(int32_t streamId, const std::string& errMsg)
-{
-    int32_t ret = HiSysEventNameSpace::Write(DOMAIN_STR,
-        "STOP_CAPTURE_EVENT",
-        HiSysEventNameSpace::EventType::BEHAVIOR,
-        "STREAMID", streamId,
         "MSG", errMsg);
     if (ret != DCAMERA_OK) {
         DHLOGE("Write HiSysEvent error, ret:%d, errMsg %s.", ret, errMsg.c_str());

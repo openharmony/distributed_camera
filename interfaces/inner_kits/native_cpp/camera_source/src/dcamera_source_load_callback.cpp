@@ -44,7 +44,7 @@ void DCameraSourceLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
     DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
-        ReportLoadSaFail(systemAbilityId, "dcamera source OnLoadSystemAbilityFail.");
+        ReportStartSaFail(SA_ERROR, systemAbilityId, "dcamera source OnLoadSystemAbilityFail.");
         return;
     }
     DCameraSourceHandler::GetInstance().FinishStartSAFailed(systemAbilityId);

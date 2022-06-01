@@ -236,7 +236,7 @@ int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::
     int32_t ret = sinkDevice->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSinkService::OpenChannel failed, ret: %d", ret);
-        ReportCameraOperaterFail(dhId, "sink service open channel failed.");
+        ReportSinkOpenCamFail(SINK_OPEN_CAMERA_ERROR, dhId, "sink service open channel failed.");
         return ret;
     }
     DHLOGI("DistributedCameraSinkService::OpenChannel success");
