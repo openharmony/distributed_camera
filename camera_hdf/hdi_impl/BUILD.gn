@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -31,12 +31,6 @@ ohos_shared_library("distributed_camera_hdf") {
     "../interfaces/hdi_ipc/server/provider",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
-    "${common_path}/include/utils",
-    "${common_path}/include/constants",
-    "${fwk_common_path}/log/include",
-    "${fwk_common_path}/utils/include/",
-    "${fwk_utils_path}/include",
-    "${fwk_utils_path}/include/log",
     "${display_hdf_path}/interfaces/include",
     "${hdf_framework_path}/include/utils",
     "${hdf_framework_path}/include/core",
@@ -70,14 +64,16 @@ ohos_shared_library("distributed_camera_hdf") {
     "src/dstream_operator/dimage_buffer.cpp",
     "src/dstream_operator/doffline_stream_operator.cpp",
     "src/dstream_operator/dstream_operator.cpp",
+    "src/utils/anonymous_string.cpp",
     "src/utils/dcamera.cpp",
+    "src/utils/dh_log.cpp",
   ]
 
   deps = [
-    "${common_path}:distributed_camera_utils",
-    "${fwk_utils_path}:distributedhardwareutils",
     "//drivers/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
+    "//drivers/peripheral/display/hal:hdi_display_gralloc",
+    "//foundation/graphic/graphic/frameworks/surface:surface",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

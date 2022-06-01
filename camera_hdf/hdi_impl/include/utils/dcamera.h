@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@ namespace DistributedHardware {
 using namespace OHOS::Camera;
 using RetCode = uint32_t;
 using MetaType = int32_t;
+const std::string BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 CamRetCode MapToExternalRetCode(DCamRetCode retCode);
 
@@ -32,6 +33,12 @@ DCamRetCode MapToInternalRetCode(CamRetCode retCode);
 uint64_t GetCurrentLocalTimeStamp();
 
 void SplitString(const std::string &str, std::vector<std::string> &tokens, const std::string &delimiters);
+
+std::string Base64Encode(const unsigned char *toEncode, unsigned int len);
+
+std::string Base64Decode(const std::string& basicString);
+
+bool IsBase64(unsigned char c);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_H
