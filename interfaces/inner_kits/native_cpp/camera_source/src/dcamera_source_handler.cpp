@@ -16,6 +16,7 @@
 #include "dcamera_source_handler.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_source_callback.h"
 #include "dcamera_source_handler_ipc.h"
 #include "dcamera_source_load_callback.h"
@@ -43,6 +44,7 @@ int32_t DCameraSourceHandler::InitSource(const std::string& params)
         DHLOGE("GetSourceLocalDHMS GetSystemAbilityManager failed");
         return DCAMERA_INIT_ERR;
     }
+    ReportSaEvent(INIT_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "init source sa event.");
     sptr<DCameraSourceLoadCallback> loadCallback = new DCameraSourceLoadCallback(params);
     int32_t ret = sm->LoadSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, loadCallback);
     if (ret != DCAMERA_OK) {
@@ -98,6 +100,7 @@ int32_t DCameraSourceHandler::ReleaseSource()
         DHLOGE("DCameraSourceHandler ReleaseSource get Service failed");
         return DCAMERA_INIT_ERR;
     }
+    ReportSaEvent(RELEASE_SA_EVENT, DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID, "release source sa event.");
     dCameraSourceSrv->ReleaseSource();
     DCameraSourceHandlerIpc::GetInstance().UnInit();
     std::unique_lock<std::mutex> lock(producerMutex_);

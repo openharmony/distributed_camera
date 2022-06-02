@@ -24,6 +24,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_handler.h"
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_sink_service_ipc.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -235,6 +236,7 @@ int32_t DistributedCameraSinkService::OpenChannel(const std::string& dhId, std::
     int32_t ret = sinkDevice->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSinkService::OpenChannel failed, ret: %d", ret);
+        ReportSinkOpenCamFail(SINK_OPEN_CAMERA_ERROR, dhId, "sink service open channel failed.");
         return ret;
     }
     DHLOGI("DistributedCameraSinkService::OpenChannel success");

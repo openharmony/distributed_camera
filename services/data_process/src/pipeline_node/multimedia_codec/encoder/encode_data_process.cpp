@@ -15,12 +15,13 @@
 
 #include "encode_data_process.h"
 
-#include<cmath>
+#include <cmath>
 
 #include "display_type.h"
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
 
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
 #include "encode_video_callback.h"
 
@@ -41,6 +42,9 @@ const std::map<int64_t, int32_t> EncodeDataProcess::ENCODER_BITRATE_TABLE = {
     std::map<int64_t, int32_t>::value_type(WIDTH_1280_HEIGHT_720, BITRATE_3400000),
     std::map<int64_t, int32_t>::value_type(WIDTH_1440_HEIGHT_1080, BITRATE_5000000),
     std::map<int64_t, int32_t>::value_type(WIDTH_1920_HEIGHT_1080, BITRATE_6000000),
+};
+const string ENUM_VIDEOFORMAT_STRINGS[] = {
+    "YUVI420", "NV12", "NV21", "RGBA_8888"
 };
 
 EncodeDataProcess::~EncodeDataProcess()
@@ -112,6 +116,9 @@ int32_t EncodeDataProcess::InitEncoder()
     ret = StartVideoEncoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video encoder failed.");
+        ReportStartVideoEncoderFail(START_VIDEO_ENCODER_ERROR, sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
+            "start video encoder failed.");
         return ret;
     }
 

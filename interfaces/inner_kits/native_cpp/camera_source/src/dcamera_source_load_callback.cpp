@@ -12,7 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "dcamera_source_load_callback.h"
+
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_source_handler.h"
 #include "distributed_hardware_log.h"
 #include "distributed_camera_constants.h"
@@ -41,6 +44,7 @@ void DCameraSourceLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
     DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID) {
         DHLOGE("start systemabilityId is not sourceSAId!");
+        ReportStartSaFail(SA_ERROR, systemAbilityId, "dcamera source OnLoadSystemAbilityFail.");
         return;
     }
     DCameraSourceHandler::GetInstance().FinishStartSAFailed(systemAbilityId);

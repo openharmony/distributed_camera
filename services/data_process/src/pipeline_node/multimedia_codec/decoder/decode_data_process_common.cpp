@@ -18,12 +18,17 @@
 #include "distributed_hardware_log.h"
 #include "graphic_common_c.h"
 
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_utils_tools.h"
 #include "decode_surface_listener.h"
 #include "decode_video_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+const string ENUM_VIDEOFORMAT_STRINGS[] = {
+    "YUVI420", "NV12", "NV21", "RGBA_8888"
+};
+
 DecodeDataProcess::~DecodeDataProcess()
 {
     if (isDecoderProcess_.load()) {
@@ -106,6 +111,9 @@ int32_t DecodeDataProcess::InitDecoder()
     ret = StartVideoDecoder();
     if (ret != DCAMERA_OK) {
         DHLOGE("Start Video decoder failed.");
+        ReportStartVideoDecoderFail(START_VIDEO_DECODER_ERROR, sourceConfig_.GetWidth(), sourceConfig_.GetHeight(),
+            ENUM_VIDEOFORMAT_STRINGS[static_cast<int32_t>(sourceConfig_.GetVideoformat())],
+            "start video decoder failed.");
         return ret;
     }
     return DCAMERA_OK;

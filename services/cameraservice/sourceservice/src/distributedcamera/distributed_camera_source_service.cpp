@@ -24,6 +24,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_hdf_operate.h"
+#include "dcamera_hisysevent_adapter.h"
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
@@ -142,6 +143,8 @@ int32_t DistributedCameraSourceService::RegisterDistributedHardware(const std::s
     ret = camDev->RegisterDistributedHardware(devId, dhId, reqId, param.version, param.attrs);
     if (ret != DCAMERA_OK) {
         DHLOGE("DistributedCameraSourceService RegisterDistributedHardware failed, ret: %d", ret);
+        ReportRegisterCameraFail(REGISTER_CAMERA_ERROR, GetAnonyString(devId), dhId, param.version,
+            "dcamera source RegisterDistributedHardware fail.");
         camerasMap_.erase(camIndex);
     }
     DHLOGI("DistributedCameraSourceService RegisterDistributedHardware end devId: %s, dhId: %s, version: %s",
@@ -195,6 +198,7 @@ int32_t DistributedCameraSourceService::LoadDCameraHDF()
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {
         DHLOGE("load hdf driver failed, ret %d", ret);
+        ReportStartHDFFail(HDF_ERROR, "dcamera load hdf driver fail.");
         return ret;
     }
     DHLOGI("load hdf driver end");

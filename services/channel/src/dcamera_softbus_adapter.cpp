@@ -21,6 +21,7 @@
 #include "softbus_common.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hisysevent_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -125,6 +126,8 @@ int32_t DCameraSoftbusAdapter::CreateSoftbusSessionServer(std::string sessionNam
     int32_t ret = CreateSessionServer(PKG_NAME.c_str(), sessionName.c_str(), &sessListeners_[role]);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter CreateSessionServer failed, ret: %d", ret);
+        ReportSoftbusSessionServerFail(SOFTBUS_SESSIONSERVER_ERROR, PKG_NAME,
+            sessionName, "create session server failed");
         return ret;
     }
     sessionTotal_[sessionName]++;
@@ -197,6 +200,8 @@ int32_t DCameraSoftbusAdapter::OpenSoftbusSession(std::string mySessName, std::s
     int32_t sessionId = OpenSession(mySessName.c_str(), peerSessName.c_str(), peerDevId.c_str(), "0", &attr);
     if (sessionId < 0) {
         DHLOGE("DCameraSoftbusAdapter OpenSoftbusSession failed %d", sessionId);
+        ReportSoftbusSessionFail(SOFTBUS_SESSION_ERROR, mySessName, peerSessName,
+            peerDevId, "open softbus session failed.");
         return DCAMERA_BAD_OPERATE;
     }
     return DCAMERA_OK;
