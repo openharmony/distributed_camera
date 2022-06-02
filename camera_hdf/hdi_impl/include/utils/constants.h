@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,36 @@ const uint32_t WAIT_OPEN_TIMEOUT_SEC = 5;
 const std::string ENCODE_TYPE_STR_H264 = "OMX_hisi_video_encoder_avc";
 const std::string ENCODE_TYPE_STR_H265 = "OMX_hisi_video_encoder_hevc";
 const std::string ENCODE_TYPE_STR_JPEG = "jpeg";
+const std::string DH_LOG_TITLE_TAG = "DHFWK";
+constexpr int32_t LOG_MAX_LEN = 4096;
+
+typedef enum {
+    OHOS_CAMERA_FORMAT_INVALID = 0,
+    OHOS_CAMERA_FORMAT_RGBA_8888,
+    OHOS_CAMERA_FORMAT_YCBCR_420_888,
+    OHOS_CAMERA_FORMAT_YCRCB_420_SP,
+    OHOS_CAMERA_FORMAT_JPEG,
+} DCameraFormat;
+
+typedef enum {
+    DCAMERA_MESSAGE = 0,
+    DCAMERA_OPERATION = 1,
+} DCameraEventType;
+
+typedef enum {
+    DCAMERA_EVENT_CHANNEL_DISCONNECTED = 0,
+    DCAMERA_EVENT_CHANNEL_CONNECTED = 1,
+    DCAMERA_EVENT_CAMERA_SUCCESS = 2,
+
+    DCAMERA_EVENT_CAMERA_ERROR = -1,
+    DCAMERA_EVENT_OPEN_CHANNEL_ERROR = -2,
+    DCAMERA_EVENT_CLOSE_CHANNEL_ERROR = -3,
+    DCAMERA_EVENT_CONFIG_STREAMS_ERROR = -4,
+    DCAMERA_EVENT_RELEASE_STREAMS_ERROR = -5,
+    DCAMERA_EVENT_START_CAPTURE_ERROR = -6,
+    DCAMERA_EVENT_STOP_CAPTURE_ERROR = -7,
+    DCAMERA_EVENT_UPDATE_SETTINGS_ERROR = -8,
+} DCameraEventResult;
 
 enum DCameraBufferUsage : uint64_t {
     CAMERA_USAGE_SW_READ_OFTEN = (1 << 0),

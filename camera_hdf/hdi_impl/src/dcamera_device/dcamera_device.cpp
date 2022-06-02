@@ -18,9 +18,10 @@
 #include <iterator>
 #include <sstream>
 #include "anonymous_string.h"
+#include "constants.h"
+#include "dcamera.h"
 #include "dcamera_host.h"
 #include "dcamera_provider.h"
-#include "dcamera_utils_tools.h"
 #include "distributed_hardware_log.h"
 #include "metadata_utils.h"
 
