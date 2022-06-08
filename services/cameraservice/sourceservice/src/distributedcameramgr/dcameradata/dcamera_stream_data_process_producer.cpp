@@ -19,7 +19,6 @@
 #include <securec.h>
 
 #include "anonymous_string.h"
-#include "dcamera_hitrace_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
