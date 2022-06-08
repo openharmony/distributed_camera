@@ -107,6 +107,7 @@ ohos_shared_library("distributed_camera_source") {
     "device_driver_framework:libhdf_utils",
     "device_driver_framework:libhdi",
     "eventhandler:libeventhandler",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

@@ -16,6 +16,7 @@
 #include "dcamera_source_input.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hitrace_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -179,6 +180,7 @@ int32_t DCameraSourceInput::StopCapture(std::vector<int>& streamIds, bool& isAll
 
 int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
 {
+    DcameraStartAsyncTrace(DCAMERA_INPUT_OPEN_START, DCAMERA_INPUT_OPEN_TASKID);
     DHLOGI("DCameraSourceInput OpenChannel devId %s dhId %s continue state: %d, snapshot state: %d",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), channelState_[CONTINUOUS_FRAME],
         channelState_[SNAPSHOT_FRAME]);
@@ -324,6 +326,7 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
             break;
         }
         default: {
+            DcameraFinishAsyncTrace(DCAMERA_INPUT_OPEN_START, DCAMERA_INPUT_OPEN_TASKID);
             DHLOGI("DCameraSourceInput OnSessionState state %d", state);
             break;
         }

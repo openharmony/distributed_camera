@@ -17,6 +17,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_hitrace_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -214,6 +215,7 @@ void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
 
 int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
+    DcameraSyncTrace();
     DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(REGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
@@ -259,6 +261,7 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
 
 int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
+    DcameraSyncTrace();
     DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(UNREGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
@@ -403,6 +406,7 @@ int32_t DCameraSourceDev::ExecuteReleaseAllStreams()
 
 int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
+    DcameraStartAsyncTrace(DCAMERA_CAPTURE_FIRST_FRAME, DCAMERA_CAPTURE_FIRST_FRAM_TASKID);
     DHLOGI("DCameraSourceDev Execute StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StartCapture(captureInfos);

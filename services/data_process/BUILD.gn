@@ -84,6 +84,7 @@ ohos_shared_library("distributed_camera_data_process") {
 
   external_deps = [
     "eventhandler:libeventhandler",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_media_standard:media_client",
   ]
