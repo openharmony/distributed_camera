@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 constexpr int32_t REVEIVE_FIRST_STREAM = 1;
-int32_t g_countStream = 0;
+int32_t g_countContStream = 0;
 DCameraSourceDataProcess::DCameraSourceDataProcess(std::string devId, std::string dhId, DCStreamType streamType)
     : devId_(devId), dhId_(dhId), streamType_(streamType)
 {
@@ -42,10 +42,12 @@ DCameraSourceDataProcess::~DCameraSourceDataProcess()
 
 int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
-    g_countStream++;
-    if (g_countStream == REVEIVE_FIRST_STREAM && streamType_ == CONTINUOUS_FRAME) {
-        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
-    } else if (g_countStream == REVEIVE_FIRST_STREAM && streamType_ == SNAPSHOT_FRAME) {
+    if (streamType_ == CONTINUOUS_FRAME) {
+        g_countContStream++;
+        if (g_countContStream == REVEIVE_FIRST_STREAM) {
+            DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        }
+    } else if (streamType_ == SNAPSHOT_FRAME) {
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
     if (buffers.size() > DCAMERA_MAX_NUM) {
