@@ -47,6 +47,7 @@ private:
     std::string devId_;
     std::string dhId_;
     DCStreamType streamType_;
+    bool IsFirstContStream_ = true;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
