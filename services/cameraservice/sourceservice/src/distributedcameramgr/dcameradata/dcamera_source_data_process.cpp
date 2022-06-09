@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 DCameraSourceDataProcess::DCameraSourceDataProcess(std::string devId, std::string dhId, DCStreamType streamType)
-    : devId_(devId), dhId_(dhId), streamType_(streamType)
+    : devId_(devId), dhId_(dhId), streamType_(streamType), isFirstContStream_(true)
 {
     DHLOGI("DCameraSourceDataProcess Constructor devId %s dhId %s streamType %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), streamType_);
@@ -40,9 +40,9 @@ DCameraSourceDataProcess::~DCameraSourceDataProcess()
 
 int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
-    if (IsFirstContStream_ && streamType_ == CONTINUOUS_FRAME) {
+    if (isFirstContStream_ && streamType_ == CONTINUOUS_FRAME) {
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
-        IsFirstContStream_ = false;
+        isFirstContStream_ = false;
     } else if (streamType_ == SNAPSHOT_FRAME) {
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
@@ -158,6 +158,7 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
 
 int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
 {
+    isFirstContStream_ = true;
     DHLOGI("DCameraSourceDataProcess StopCapture devId %s dhId %s streamType: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), streamType_);
     std::set<int32_t> streamIdSet(streamIds.begin(), streamIds.end());
