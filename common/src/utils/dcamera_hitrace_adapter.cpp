@@ -14,6 +14,7 @@
  */
 
 #include "dcamera_hitrace_adapter.h"
+#include "distributed_hardware_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -24,6 +25,7 @@ void DcameraStartAsyncTrace(const std::string& str, int32_t taskId)
 
 void DcameraFinishAsyncTrace(const std::string& str, int32_t taskId)
 {
+    DHLOGI("cmh++ DcameraFinishAsyncTrace str: %s, taskId %d", str.c_str(), taskId);
     FinishAsyncTrace(DCAMERA_HITRACE_LABEL, str, taskId);
 }
 } // namespace DistributedHardware

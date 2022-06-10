@@ -46,6 +46,7 @@ int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuf
         DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
         isFirstContStream_ = false;
     } else if (streamType_ == SNAPSHOT_FRAME) {
+        DHLOGI("cmh***22 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
     if (buffers.size() > DCAMERA_MAX_NUM) {
