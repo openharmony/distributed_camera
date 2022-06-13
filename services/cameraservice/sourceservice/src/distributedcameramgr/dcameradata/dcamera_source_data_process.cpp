@@ -147,7 +147,7 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
         captureInfo->width_, captureInfo->height_, captureInfo->format_, captureInfo->isCapture_,
         captureInfo->dataspace_, captureInfo->encodeType_, captureInfo->type_);
     DHLOGI("cmh--- StartCapture isFirstContStream_ %d", isFirstContStream_);
-    if (streamType_ == CONTINUOUS_FRAME) {
+    if (streamType_ == CONTINUOUS_FRAME && captureInfo->isCapture_ == true) {
         DHLOGI("cmh--- StartCapture streamType_ %d", streamType_);
         isFirstContStream_ = true;
     }
