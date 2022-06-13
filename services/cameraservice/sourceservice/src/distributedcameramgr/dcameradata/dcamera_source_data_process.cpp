@@ -40,11 +40,16 @@ DCameraSourceDataProcess::~DCameraSourceDataProcess()
 
 int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
+    DHLOGI("cmh*** FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
     if (isFirstContStream_ && streamType_ == CONTINUOUS_FRAME) {
-        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DHLOGI("cmh***11 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
         isFirstContStream_ = false;
+        DHLOGI("cmh***1122 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
     } else if (streamType_ == SNAPSHOT_FRAME) {
+        DHLOGI("cmh***22 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
         DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+        DHLOGI("cmh***2233 FeedStream isFirstContStream_: %d, streamType_ %d", isFirstContStream_, streamType_);
     }
     if (buffers.size() > DCAMERA_MAX_NUM) {
         DHLOGI("DCameraSourceDataProcess FeedStream devId %s dhId %s size: %d over flow",
@@ -141,6 +146,11 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
         "dataspace: %d, encodeType: %d, streamType: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         captureInfo->width_, captureInfo->height_, captureInfo->format_, captureInfo->isCapture_,
         captureInfo->dataspace_, captureInfo->encodeType_, captureInfo->type_);
+    DHLOGI("cmh--- StartCapture isFirstContStream_ %d", isFirstContStream_);
+    if (streamType_ == CONTINUOUS_FRAME) {
+        DHLOGI("cmh--- StartCapture streamType_ %d", streamType_);
+        isFirstContStream_ = true;
+    }
 
     std::shared_ptr<DCameraStreamConfig> streamConfig =
         std::make_shared<DCameraStreamConfig>(captureInfo->width_, captureInfo->height_, captureInfo->format_,
@@ -167,9 +177,6 @@ int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
     }
     for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
         (*iter)->StopCapture(streamIdSet);
-    }
-    if (streamType_ == CONTINUOUS_FRAME && GetProducerSize() == 0) {
-        isFirstContStream_ = true;
     }
     return DCAMERA_OK;
 }
