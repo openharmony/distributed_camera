@@ -163,10 +163,6 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
 
 int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
 {
-    if (streamType_ == CONTINUOUS_FRAME && GetProducerSize() == 0) {
-        DHLOGI("cmh--- StopCapture streamType_ %d", streamType_);
-        isFirstContStream_ = true;
-    }
     DHLOGI("DCameraSourceDataProcess StopCapture devId %s dhId %s streamType: %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), streamType_);
     std::set<int32_t> streamIdSet(streamIds.begin(), streamIds.end());
@@ -176,6 +172,12 @@ int32_t DCameraSourceDataProcess::StopCapture(std::vector<int32_t>& streamIds)
     }
     for (auto iter = streamProcess_.begin(); iter != streamProcess_.end(); iter++) {
         (*iter)->StopCapture(streamIdSet);
+    }
+    int32_t temp = GetProducerSize();
+    DHLOGI("cmh--- StopCapture GetProducerSize %d", temp);
+    if (streamType_ == CONTINUOUS_FRAME && GetProducerSize() == 0) {
+        DHLOGI("cmh--- StopCapture streamType_ %d", streamType_);
+        isFirstContStream_ = true;
     }
     return DCAMERA_OK;
 }
