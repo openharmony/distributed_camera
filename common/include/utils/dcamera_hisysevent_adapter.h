@@ -32,7 +32,7 @@ const std::string OPEN_CAMERA_EVENT = "DCAMERA_OPEN";
 const std::string CLOSE_CAMERA_EVENT = "DCAMERA_CLOSE";
 const std::string START_CAPTURE_EVENT = "DCAMERA_CAPTURE";
 
-enum DcameraHisyseventErrno {
+enum DcameraHisyseventErrno : int32_t  {
     DCAMERA_SA_ERROR = 0,
     DCAMERA_HDF_ERROR = 1,
     DCAMERA_CREATE_SESSIONSVR_ERROR = 2,

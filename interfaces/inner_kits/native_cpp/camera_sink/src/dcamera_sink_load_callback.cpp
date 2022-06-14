@@ -42,8 +42,6 @@ void DCameraSinkLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId
 void DCameraSinkLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
     DHLOGI("OnLoadSystemAbilityFail systemAbilityId: %d.", systemAbilityId);
-    ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_SA_ERROR,
-            CreateMsg("dcamera sink OnLoadSystemAbilityFail, systemAbilityId: %d", systemAbilityId));
     if (systemAbilityId != DISTRIBUTED_HARDWARE_CAMERA_SINK_SA_ID) {
         DHLOGE("start aystemabilityId is not sinkSAId!");
         ReportDcamerInitFail(DCAMERA_INIT_FAIL, DCAMERA_SA_ERROR,

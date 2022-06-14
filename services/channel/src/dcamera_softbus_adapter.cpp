@@ -124,6 +124,8 @@ int32_t DCameraSoftbusAdapter::CreateSoftbusSessionServer(std::string sessionNam
     }
 
     int32_t ret = CreateSessionServer(PKG_NAME.c_str(), sessionName.c_str(), &sessListeners_[role]);
+    ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_CREATE_SESSIONSVR_ERROR,
+            CreateMsg("create session server failed, sessionName %s", sessionName.c_str()));
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSoftbusAdapter CreateSessionServer failed, ret: %d", ret);
         ReportDcamerOptFail(DCAMERA_OPT_FAIL, DCAMERA_CREATE_SESSIONSVR_ERROR,
