@@ -16,6 +16,7 @@
 #include "dcamera_source_input.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hitrace_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -184,11 +185,13 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         channelState_[SNAPSHOT_FRAME]);
     int32_t ret = DCAMERA_OK;
     if (channelState_[CONTINUOUS_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
         ret = channels_[CONTINUOUS_FRAME]->CreateSession(indexs, CONTINUE_SESSION_FLAG, DCAMERA_SESSION_MODE_VIDEO,
             listeners_[CONTINUOUS_FRAME]);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput CreateSession continue failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
             return ret;
         }
 
@@ -196,16 +199,19 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput OpenChannel continue stream failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
             return ret;
         }
     }
 
     if (channelState_[SNAPSHOT_FRAME] == DCAMERA_CHANNEL_STATE_DISCONNECTED) {
+        DcameraStartAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
         ret = channels_[SNAPSHOT_FRAME]->CreateSession(indexs, SNAP_SHOT_SESSION_FLAG, DCAMERA_SESSION_MODE_JPEG,
             listeners_[SNAPSHOT_FRAME]);
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput Init CreateSession snapshot failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
             return ret;
         }
 
@@ -213,6 +219,7 @@ int32_t DCameraSourceInput::OpenChannel(std::vector<DCameraIndex>& indexs)
         if (ret != DCAMERA_OK) {
             DHLOGE("DCameraSourceInput OpenChannel snapshot stream failed ret: %d, devId: %s, dhId: %s", ret,
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
             return ret;
         }
     }
@@ -311,6 +318,7 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
     channelState_[streamType] = (DCameraChannelState)state;
     switch (state) {
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
+            FinshFrameAsyncTrace(streamType);
             DHLOGI("DCameraSourceDev PostTask CloseSession Input OnClose devId %s dhId %s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             DCameraIndex camIndex(devId_, dhId_);
@@ -323,10 +331,24 @@ void DCameraSourceInput::OnSessionState(DCStreamType streamType, int32_t state)
             eventBus_->PostEvent<DCameraSourceEvent>(srcEvent);
             break;
         }
+        case DCAMERA_CHANNEL_STATE_CONNECTED: {
+            FinshFrameAsyncTrace(streamType);
+            DHLOGI("DCameraSourceInput OnSessionState state %d", state);
+            break;
+        }
         default: {
             DHLOGI("DCameraSourceInput OnSessionState state %d", state);
             break;
         }
+    }
+}
+
+void DCameraSourceInput::FinshFrameAsyncTrace(DCStreamType streamType)
+{
+    if (streamType == CONTINUOUS_FRAME) {
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_CONTINUE, DCAMERA_OPEN_DATA_CONTINUE_TASKID);
+    } else if (streamType == SNAPSHOT_FRAME) {
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_DATA_SNAPSHOT, DCAMERA_OPEN_DATA_SNAPSHOT_TASKID);
     }
 }
 

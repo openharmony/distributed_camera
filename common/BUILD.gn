@@ -43,6 +43,7 @@ ohos_shared_library("distributed_camera_utils") {
     "src/utils/data_buffer.cpp",
     "src/utils/dcamera_buffer_handle.cpp",
     "src/utils/dcamera_hisysevent_adapter.cpp",
+    "src/utils/dcamera_hitrace_adapter.cpp",
     "src/utils/dcamera_sa_process_state.cpp",
     "src/utils/dcamera_utils_tools.cpp",
   ]
@@ -62,6 +63,7 @@ ohos_shared_library("distributed_camera_utils") {
     "dsoftbus_standard:softbus_client",
     "graphic_chipsetsdk:buffer_handle",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
   ]
 

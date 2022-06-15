@@ -17,6 +17,7 @@
 
 #include "anonymous_string.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_hitrace_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -214,6 +215,7 @@ void DCameraSourceDev::OnEvent(DCameraSourceEvent& event)
 
 int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
+    DCAMERA_SYNC_TRACE;
     DHLOGI("DCameraSourceDev Execute Register devId: %s dhId: %s",
         GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(REGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
@@ -259,6 +261,7 @@ int32_t DCameraSourceDev::ExecuteRegister(std::shared_ptr<DCameraRegistParam>& p
 
 int32_t DCameraSourceDev::ExecuteUnRegister(std::shared_ptr<DCameraRegistParam>& param)
 {
+    DCAMERA_SYNC_TRACE;
     DHLOGI("DCameraSourceDev Execute UnRegister devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     ReportRegisterCameraEvent(UNREGIST_CAMERA_EVENT, GetAnonyString(devId_), dhId_,
@@ -307,10 +310,12 @@ int32_t DCameraSourceDev::ExecuteOpenCamera()
         return ret;
     }
 
+    DcameraStartAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
     ret = controller_->OpenChannel(openInfo);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute OpenCamera OpenChannel failed, ret: %d, devId: %s dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
         return DCAMERA_OPEN_CONFLICT;
     }
     return DCAMERA_OK;
@@ -403,12 +408,15 @@ int32_t DCameraSourceDev::ExecuteReleaseAllStreams()
 
 int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
 {
+    HitraceAndHisyseventImpl(captureInfos);
     DHLOGI("DCameraSourceDev Execute StartCapture devId %s dhId %s", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str());
     int32_t ret = input_->StartCapture(captureInfos);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev input StartCapture failed ret: %d, devId: %s, dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
         return ret;
     }
     std::vector<std::shared_ptr<DCameraCaptureInfo>> captures;
@@ -425,15 +433,6 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), (*iter)->captureSettings_.size(),
             capture->width_, capture->height_, capture->format_, capture->isCapture_ ? 1 : 0, capture->encodeType_,
             capture->streamType_);
-        EventCaptureInfo eventCaptureInfo = {
-            .width_ = capture->width_,
-            .height_ = capture->height_,
-            .format_ = capture->format_,
-            .isCapture_ = capture->isCapture_,
-            .encodeType_ = capture->encodeType_,
-            .type_ = capture->streamType_,
-        };
-        ReportStartCaptureEvent(START_CAPTURE_EVENT, eventCaptureInfo, "execute start capture event.");
         for (auto settingIter = (*iter)->captureSettings_.begin(); settingIter != (*iter)->captureSettings_.end();
             settingIter++) {
             std::shared_ptr<DCameraSettings> setting = std::make_shared<DCameraSettings>();
@@ -448,8 +447,31 @@ int32_t DCameraSourceDev::ExecuteStartCapture(std::vector<std::shared_ptr<DCCapt
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSourceDev Execute StartCapture StartCapture failed, ret: %d, devId: %s dhId: %s", ret,
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
     }
     return ret;
+}
+
+void DCameraSourceDev::HitraceAndHisyseventImpl(std::vector<std::shared_ptr<DCCaptureInfo>>& captureInfos)
+{
+    for (auto iter = captureInfos.begin(); iter != captureInfos.end(); iter++) {
+        std::shared_ptr<DCCaptureInfo> capture = *iter;
+        EventCaptureInfo eventCaptureInfo = {
+            .width_ = capture->width_,
+            .height_ = capture->height_,
+            .format_ = capture->format_,
+            .isCapture_ = capture->isCapture_,
+            .encodeType_ = capture->encodeType_,
+            .type_ = capture->type_,
+        };
+        ReportStartCaptureEvent(START_CAPTURE_EVENT, eventCaptureInfo, "execute start capture event.");
+        if (capture->type_ == CONTINUOUS_FRAME && capture->isCapture_ == true) {
+            DcameraStartAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        } else if (capture->type_ == SNAPSHOT_FRAME && capture->isCapture_ == true) {
+            DcameraStartAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+        }
+    }
 }
 
 int32_t DCameraSourceDev::ExecuteStopCapture(std::vector<int>& streamIds, bool& isAllStop)

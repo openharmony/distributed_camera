@@ -25,6 +25,7 @@
 #include "anonymous_string.h"
 #include "dcamera_hdf_operate.h"
 #include "dcamera_hisysevent_adapter.h"
+#include "dcamera_hitrace_adapter.h"
 #include "dcamera_service_state_listener.h"
 #include "dcamera_source_service_ipc.h"
 #include "distributed_camera_errno.h"
@@ -194,6 +195,7 @@ int32_t DistributedCameraSourceService::DCameraNotify(const std::string& devId, 
 
 int32_t DistributedCameraSourceService::LoadDCameraHDF()
 {
+    DCAMERA_SYNC_TRACE;
     DHLOGI("load hdf driver start");
     int32_t ret = DCameraHdfOperate::GetInstance().LoadDcameraHDFImpl();
     if (ret != DCAMERA_OK) {

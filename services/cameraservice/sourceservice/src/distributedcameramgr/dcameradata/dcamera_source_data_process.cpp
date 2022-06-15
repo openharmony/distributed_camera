@@ -16,6 +16,7 @@
 #include "dcamera_source_data_process.h"
 
 #include "anonymous_string.h"
+#include "dcamera_hitrace_adapter.h"
 #include "distributed_camera_constants.h"
 #include "distributed_camera_errno.h"
 #include "distributed_hardware_log.h"
@@ -23,7 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 DCameraSourceDataProcess::DCameraSourceDataProcess(std::string devId, std::string dhId, DCStreamType streamType)
-    : devId_(devId), dhId_(dhId), streamType_(streamType)
+    : devId_(devId), dhId_(dhId), streamType_(streamType), isFirstContStream_(true)
 {
     DHLOGI("DCameraSourceDataProcess Constructor devId %s dhId %s streamType %d", GetAnonyString(devId_).c_str(),
         GetAnonyString(dhId_).c_str(), streamType_);
@@ -39,6 +40,12 @@ DCameraSourceDataProcess::~DCameraSourceDataProcess()
 
 int32_t DCameraSourceDataProcess::FeedStream(std::vector<std::shared_ptr<DataBuffer>>& buffers)
 {
+    if (isFirstContStream_ && streamType_ == CONTINUOUS_FRAME) {
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        isFirstContStream_ = false;
+    } else if (streamType_ == SNAPSHOT_FRAME) {
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+    }
     if (buffers.size() > DCAMERA_MAX_NUM) {
         DHLOGI("DCameraSourceDataProcess FeedStream devId %s dhId %s size: %d over flow",
             GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(), buffers.size());
@@ -134,6 +141,9 @@ int32_t DCameraSourceDataProcess::StartCapture(std::shared_ptr<DCCaptureInfo>& c
         "dataspace: %d, encodeType: %d, streamType: %d", GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str(),
         captureInfo->width_, captureInfo->height_, captureInfo->format_, captureInfo->isCapture_,
         captureInfo->dataspace_, captureInfo->encodeType_, captureInfo->type_);
+    if (streamType_ == CONTINUOUS_FRAME && captureInfo->isCapture_ == true) {
+        isFirstContStream_ = true;
+    }
 
     std::shared_ptr<DCameraStreamConfig> streamConfig =
         std::make_shared<DCameraStreamConfig>(captureInfo->width_, captureInfo->height_, captureInfo->format_,

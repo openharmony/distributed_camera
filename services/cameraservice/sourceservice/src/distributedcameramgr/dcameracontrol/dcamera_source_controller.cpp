@@ -20,6 +20,7 @@
 
 #include "dcamera_capture_info_cmd.h"
 #include "dcamera_channel_source_impl.h"
+#include "dcamera_hitrace_adapter.h"
 #include "dcamera_metadata_setting_cmd.h"
 #include "dcamera_protocol.h"
 #include "dcamera_source_controller_channel_listener.h"
@@ -165,6 +166,10 @@ int32_t DCameraSourceController::ChannelNeg(std::shared_ptr<DCameraChannelInfo>&
 
 int32_t DCameraSourceController::DCameraNotify(std::shared_ptr<DCameraEvent>& events)
 {
+    if (events->eventResult_ == DCAMERA_EVENT_CAMERA_ERROR) {
+        DcameraFinishAsyncTrace(DCAMERA_CONTINUE_FIRST_FRAME, DCAMERA_CONTINUE_FIRST_FRAME_TASKID);
+        DcameraFinishAsyncTrace(DCAMERA_SNAPSHOT_FIRST_FRAME, DCAMERA_SNAPSHOT_FIRST_FRAME_TASKID);
+    }
     sptr<IDCameraProvider> camHdiProvider = IDCameraProvider::Get(HDF_DCAMERA_EXT_SERVICE);
     if (camHdiProvider == nullptr) {
         DHLOGI("DCameraNotify camHdiProvider is nullptr devId: %s dhId: %s", GetAnonyString(devId_).c_str(),
@@ -381,6 +386,7 @@ void DCameraSourceController::OnSessionState(int32_t state)
     channelState_ = state;
     switch (state) {
         case DCAMERA_CHANNEL_STATE_CONNECTED: {
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
             stateMachine_->UpdateState(DCAMERA_STATE_OPENED);
             std::shared_ptr<DCameraEvent> camEvent = std::make_shared<DCameraEvent>();
             camEvent->eventType_ = DCAMERA_MESSAGE;
@@ -390,6 +396,7 @@ void DCameraSourceController::OnSessionState(int32_t state)
             break;
         }
         case DCAMERA_CHANNEL_STATE_DISCONNECTED: {
+            DcameraFinishAsyncTrace(DCAMERA_OPEN_CHANNEL_CONTROL, DCAMERA_OPEN_CHANNEL_TASKID);
             DHLOGI("DCameraSourceDev PostTask Controller CloseSession OnClose devId %s dhId %s",
                 GetAnonyString(devId_).c_str(), GetAnonyString(dhId_).c_str());
             DCameraIndex camIndex(devId_, dhId_);
