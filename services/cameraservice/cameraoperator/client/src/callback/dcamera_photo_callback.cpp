@@ -49,7 +49,7 @@ void DCameraPhotoCallback::OnCaptureError(const int32_t captureId, const int32_t
 
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
     event->eventType_ = DCAMERA_MESSAGE;
-    event->eventResult_ = DCAMERA_EVENT_CAMERA_ERROR;
+    event->eventResult_ = DCAMERA_DEVICE_ERROR;
     callback_->OnStateChanged(event);
 }
 } // namespace DistributedHardware

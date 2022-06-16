@@ -90,7 +90,7 @@ private:
     void ExtractStreamInfo(DCStreamInfo &dstStreamInfo, const std::shared_ptr<DCStreamInfo> &srcStreamInfo);
     void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
     void ExtractCameraAttr(Json::Value &rootValue, std::set<int> &allFormats, std::vector<int> &photoFormats);
-    void SetSrcStreamInfo(std::vector<std::shared_ptr<DCStreamInfo>>& srcStreamInfo);
+    void SetSrcStreamInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo, std::vector<std::shared_ptr<DCStreamInfo>>& srcStreamInfo);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;

@@ -31,10 +31,13 @@ void DCameraInputCallback::OnError(const int32_t errorType, const int32_t errorM
         DHLOGE("DCameraInputCallback::OnError StateCallback is null");
         return;
     }
-
     std::shared_ptr<DCameraEvent> event = std::make_shared<DCameraEvent>();
     event->eventType_ = DCAMERA_MESSAGE;
-    event->eventResult_ = DCAMERA_EVENT_CAMERA_ERROR;
+    if (errorType == CamServiceError::) {
+        event->eventResult_ = DCAMERA_DEVICE_PREEMPT;
+    } else {
+        event->eventResult_ = DCAMERA_EVENT_CAMERA_ERROR;
+    }
     callback_->OnStateChanged(event);
 }
 } // namespace DistributedHardware

@@ -79,7 +79,7 @@ int32_t DCameraSinkController::StopCapture()
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StopCapture client stop capture failed, dhId: %s, ret: %d",
                GetAnonyString(dhId_).c_str(), ret);
-        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("operator stop capture failed"));
+        DCameraNotifyInner(DCAMERA_MESSAGE, ret, std::string("operator stop capture failed"));
         return ret;
     }
 
@@ -87,7 +87,7 @@ int32_t DCameraSinkController::StopCapture()
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StopCapture output stop capture failed, dhId: %s, ret: %d",
                GetAnonyString(dhId_).c_str(), ret);
-        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("output stop capture failed"));
+        DCameraNotifyInner(DCAMERA_MESSAGE, ret, std::string("output stop capture failed"));
         return ret;
     }
 
@@ -309,7 +309,11 @@ void DCameraSinkController::OnStateChanged(std::shared_ptr<DCameraEvent>& event)
 {
     DHLOGI("DCameraSinkController::OnStateChanged dhId: %s, result: %d",
            GetAnonyString(dhId_).c_str(), event->eventResult_);
-    DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("camera error"));
+    if (event->eventResult_ == CamServiceError::) {
+        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_DEVICE_PREEMPT, std::string("camera preempted"));
+    } else {
+        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("camera error"));
+    }
 }
 
 void DCameraSinkController::OnMetadataResult()
@@ -387,7 +391,7 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StartCaptureInner output start capture failed, dhId: %s, ret: %d",
                GetAnonyString(dhId_).c_str(), ret);
-        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("output start capture failed"));
+        DCameraNotifyInner(DCAMERA_MESSAGE, ret, std::string("output start capture failed"));
         return ret;
     }
 
@@ -395,7 +399,7 @@ int32_t DCameraSinkController::StartCaptureInner(std::vector<std::shared_ptr<DCa
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraSinkController::StartCaptureInner camera client start capture failed, dhId: %s, ret: %d",
                GetAnonyString(dhId_).c_str(), ret);
-        DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("operator start capture failed"));
+        DCameraNotifyInner(DCAMERA_MESSAGE, ret, std::string("operator start capture failed"));
         return ret;
     }
 
