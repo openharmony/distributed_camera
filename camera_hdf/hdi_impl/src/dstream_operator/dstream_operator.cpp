@@ -746,7 +746,8 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<
     return SUCCESS;
 }
 
-void DStreamOperator::SetSrcStreamInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo, std::vector<std::shared_ptr<DCStreamInfo>>& srcStreamInfo)
+void DStreamOperator::SetSrcStreamInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo,
+    std::vector<std::shared_ptr<DCStreamInfo>>& srcStreamInfo)
 {
     for (auto &id : srcCaptureInfo->streamIds_) {
         auto iter = dcStreamInfoMap_.find(id);
