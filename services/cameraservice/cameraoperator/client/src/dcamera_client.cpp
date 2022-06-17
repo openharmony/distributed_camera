@@ -31,6 +31,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t LATITUDE = 0;
+const int32_t LONGITUDE = 1;
+const int32_t ALTITUDE = 2;
+
 DCameraClient::DCameraClient(const std::string& dhId)
 {
     DHLOGI("DCameraClient Constructor dhId: %s", GetAnonyString(dhId).c_str());
@@ -470,15 +474,20 @@ void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<Camera::Camer
     if (ret == CAM_META_SUCCESS) {
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera gpsCoordinates item",
             GetAnonyString(cameraId_).c_str());
-        double gpsCoordinates[2] = {-1.0, -1.0};
+        double gpsCoordinates[3] = {-1.0, -1.0, -1.0};
         if (memcpy_s(gpsCoordinates, sizeof(gpsCoordinates), item.data.d, sizeof(gpsCoordinates)) != EOK) {
             DHLOGE("DCameraClient::SetQualityAndGpsLocation memcpy_s gpsCoordinates failed");
             return;
         }
         DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set "
-            "gpsCoordinates[0]: %f, gpsCoordinates[1]: %f",
-            GetAnonyString(cameraId_).c_str(), gpsCoordinates[0], gpsCoordinates[1]);
-        photoCaptureSettings->SetGpsLocation(gpsCoordinates[0], gpsCoordinates[1]);
+            "gpsCoordinates[LATITUDE]: %f, gpsCoordinates[LONGITUDE]: %f,  gpsCoordinates[ALTITUDE]: %f",
+            GetAnonyString(cameraId_).c_str(), gpsCoordinates[LATITUDE],
+            gpsCoordinates[LONGITUDE], gpsCoordinates[ALTITUDE]);
+        std::unique_ptr<CameraStandard::Location> location = std::make_unique<CameraStandard::Location>();
+        location->latitude = gpsCoordinates[LATITUDE];
+        location->longitude = gpsCoordinates[LONGITUDE];
+        location->altitude = gpsCoordinates[ALTITUDE];
+        photoCaptureSettings->SetLocation(location);
     }
     return;
 }
