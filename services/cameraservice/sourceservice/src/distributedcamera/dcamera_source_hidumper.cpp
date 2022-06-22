@@ -85,8 +85,6 @@ int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string&
     auto operatorIter = ARGS_MAP.find(args);
     if (operatorIter != ARGS_MAP.end()) {
         hf = operatorIter->second;
-    } else {
-        hf = HidumpFlag::UNKNOWN;
     }
 
     if (hf == HidumpFlag::GET_HELP) {

@@ -72,8 +72,6 @@ int32_t DcameraSinkHidumper::ProcessDump(const std::string& args, std::string& r
     auto operatorIter = ARGS_MAP.find(args);
     if (operatorIter != ARGS_MAP.end()) {
         hf = operatorIter->second;
-    } else {
-        hf = HidumpFlag::UNKNOWN;
     }
 
     if (hf == HidumpFlag::GET_HELP) {
