@@ -64,6 +64,14 @@ bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::stri
         DHLOGI("DcameraSourceHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
+    if (args.empty()) {
+        ShowHelp(result);
+        return DCAMERA_OK;
+    } else if (args.size() > 1) {
+        ShowIllegalInfomation(result);
+        return DCAMERA_OK;
+    }
+
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
         return false;
     }
@@ -77,6 +85,8 @@ int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string&
     auto operatorIter = ARGS_MAP.find(args);
     if (operatorIter != ARGS_MAP.end()) {
         hf = operatorIter->second;
+    } else {
+        hf = HidumpFlag::UNKNOWN;
     }
 
     if (hf == HidumpFlag::GET_HELP) {
@@ -132,10 +142,10 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
     if (state != STATE_MAP.end()) {
         curState = state->second;
     }
-    result.append("CameraId                           ")
+    result.append("CameraId                                   ")
           .append("State\n")
           .append(deviceId)
-          .append("       ")
+          .append("               ")
           .append(curState);
     return DCAMERA_OK;
 }
@@ -164,7 +174,7 @@ void DcameraSourceHidumper::ShowHelp(std::string& result)
 int32_t DcameraSourceHidumper::ShowIllegalInfomation(std::string& result)
 {
     DHLOGI("ShowIllegalInfomation Dump.");
-    result.append("unknown command");
+    result.append("unknown command, -h for help.");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware

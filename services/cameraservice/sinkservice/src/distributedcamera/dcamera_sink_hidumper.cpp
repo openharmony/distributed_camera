@@ -51,6 +51,14 @@ bool DcameraSinkHidumper::Dump(const std::vector<std::string>& args, std::string
         DHLOGI("DcameraSinkHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
+    if (args.empty()) {
+        ShowHelp(result);
+        return DCAMERA_OK;
+    } else if (args.size() > 1) {
+        ShowIllegalInfomation(result);
+        return DCAMERA_OK;
+    }
+
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
         return false;
     }
@@ -64,6 +72,8 @@ int32_t DcameraSinkHidumper::ProcessDump(const std::string& args, std::string& r
     auto operatorIter = ARGS_MAP.find(args);
     if (operatorIter != ARGS_MAP.end()) {
         hf = operatorIter->second;
+    } else {
+        hf = HidumpFlag::UNKNOWN;
     }
 
     if (hf == HidumpFlag::GET_HELP) {
@@ -139,7 +149,7 @@ void DcameraSinkHidumper::ShowHelp(std::string& result)
 int32_t DcameraSinkHidumper::ShowIllegalInfomation(std::string& result)
 {
     DHLOGI("ShowIllegalInfomation Dump.");
-    result.append("unknown command");
+    result.append("unknown command, -h for help.");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware
