@@ -64,6 +64,14 @@ bool DcameraSourceHidumper::Dump(const std::vector<std::string>& args, std::stri
         DHLOGI("DcameraSourceHidumper Dump args[%d]: %s.", i, args.at(i).c_str());
     }
 
+    if (args.empty()) {
+        ShowHelp(result);
+        return true;
+    } else if (args.size() > 1) {
+        ShowIllegalInfomation(result);
+        return true;
+    }
+
     if (ProcessDump(args[0], result) != DCAMERA_OK) {
         return false;
     }
@@ -111,7 +119,7 @@ int32_t DcameraSourceHidumper::ProcessDump(const std::string& args, std::string&
 int32_t DcameraSourceHidumper::GetRegisteredInfo(std::string& result)
 {
     DHLOGI("GetRegisteredInfo Dump.");
-    result.append("CameraNumber\n")
+    result.append("CameraNumber: ")
           .append(std::to_string(camDumpInfo_.regNumber));
     return DCAMERA_OK;
 }
@@ -122,28 +130,28 @@ int32_t DcameraSourceHidumper::GetCurrentStateInfo(std::string& result)
     std::map<std::string, int32_t> devState = camDumpInfo_.curState;
     std::string deviceId("");
     int32_t camState = 0;
+    result.append("CameraId\tState\n");
     for (auto it = devState.begin(); it != devState.end(); it++) {
         deviceId = it->first;
         camState = it->second;
+        DHLOGI("GetCurrentStateInfo camState is %d.", camState);
+        auto state = STATE_MAP.find(camState);
+        std::string curState("");
+        if (state != STATE_MAP.end()) {
+            curState = state->second;
+        }
+        result.append(deviceId)
+              .append("\t")
+              .append(curState)
+              .append("\n");
     }
-    DHLOGI("GetCurrentStateInfo camState is %d.", camState);
-    auto state = STATE_MAP.find(camState);
-    std::string curState("");
-    if (state != STATE_MAP.end()) {
-        curState = state->second;
-    }
-    result.append("CameraId                           ")
-          .append("State\n")
-          .append(deviceId)
-          .append("       ")
-          .append(curState);
     return DCAMERA_OK;
 }
 
 int32_t DcameraSourceHidumper::GetVersionInfo(std::string& result)
 {
     DHLOGI("GetVersionInfo Dump.");
-    result.append("CameraVersion\n")
+    result.append("CameraVersion: ")
           .append(camDumpInfo_.version);
     return DCAMERA_OK;
 }
@@ -153,18 +161,20 @@ void DcameraSourceHidumper::ShowHelp(std::string& result)
     DHLOGI("ShowHelp Dump.");
     result.append("Usage:dump  <command> [options]\n")
           .append("Description:\n")
-          .append("--version         ")
-          .append("dump camera version in the system\n")
-          .append("--registered      ")
-          .append("dump number of registered cameras in the system\n")
-          .append("--curState        ")
-          .append("dump current state of the camera in the system\n");
+          .append("-h           ")
+          .append(": show help\n")
+          .append("--version    ")
+          .append(": dump camera version in the system\n")
+          .append("--registered ")
+          .append(": dump number of registered cameras in the system\n")
+          .append("--curState   ")
+          .append(": dump current state of the camera in the system\n");
 }
 
 int32_t DcameraSourceHidumper::ShowIllegalInfomation(std::string& result)
 {
     DHLOGI("ShowIllegalInfomation Dump.");
-    result.append("unknown command");
+    result.append("unknown command, -h for help.");
     return DCAMERA_OK;
 }
 } // namespace DistributedHardware
