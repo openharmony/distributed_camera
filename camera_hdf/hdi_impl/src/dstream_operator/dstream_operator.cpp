@@ -290,11 +290,11 @@ CamRetCode DStreamOperator::Capture(int captureId, const std::shared_ptr<Capture
     }
 
     for (auto &id : captureInfo->streamIds_) {
-        if (halStreamMap_.find(id) == halStreamMap_.end()) {
+        auto iter = halStreamMap_.find(id);
+        if (iter == halStreamMap_.end()) {
             DHLOGE("Invalid stream id %d", id);
             return CamRetCode::INVALID_ARGUMENT;
         }
-        auto iter = halStreamMap_.find(id);
         if (!iter->second->HasBufferQueue()) {
             DHLOGE("Stream %d has not bufferQueue.", iter->first);
             return CamRetCode::INVALID_ARGUMENT;
@@ -564,16 +564,7 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
     }
 
     uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
-    bool needReturn = false;
-    std::shared_ptr<Camera::CameraMetadata> result = nullptr;
-    DCamRetCode ret = dMetadataProcessor_->UpdateResultMetadata(needReturn, result);
-    if (ret != DCamRetCode::SUCCESS) {
-        DHLOGE("Cannot handle result metadata.");
-        return ret;
-    }
-    if (needReturn) {
-        resultCallback_(resultTimestamp, result);
-    }
+    dMetadataProcessor_->UpdateResultMetadata(resultTimestamp);
 
     auto anIter = enableShutterCbkMap_.find(streamId);
     if (anIter->second) {
@@ -599,7 +590,7 @@ DCamRetCode DStreamOperator::SetDeviceCallback(
     std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk)
 {
     errorCallback_ = errorCbk;
-    resultCallback_ = resultCbk;
+    dMetadataProcessor_->SetResultCallback(resultCbk);
     return SUCCESS;
 }
 

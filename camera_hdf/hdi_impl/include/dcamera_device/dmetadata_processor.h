@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <set>
 #include <map>
+#include <mutex>
 #include <vector>
 #include "constants.h"
 #include "dcamera.h"
@@ -47,7 +48,8 @@ public:
     DCamRetCode DisableMetadataResult(const std::vector<MetaType> &results);
     DCamRetCode ResetEnableResults();
     DCamRetCode SaveResultMetadata(std::string resultStr);
-    DCamRetCode UpdateResultMetadata(bool &needReturn, std::shared_ptr<Camera::CameraMetadata> &result);
+    void UpdateResultMetadata(const uint64_t &resultTimestamp);
+    void SetResultCallback(std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk);
     void PrintDCameraMetadata(const common_metadata_header_t *metadata);
 
 private:
@@ -58,10 +60,14 @@ private:
     void ConvertToCameraMetadata(common_metadata_header_t *&input,
                                  std::shared_ptr<Camera::CameraMetadata> &output);
     void ResizeMetadataHeader(common_metadata_header_t *&header, uint32_t itemCapacity, uint32_t dataCapacity);
+    void UpdateAllResult(const uint64_t &resultTimestamp);
+    void UpdateOnChanged(const uint64_t &resultTimestamp);
     uint32_t GetDataSize(uint32_t type);
+    void* GetMetadataItemData(const camera_metadata_item_t &item);
     std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo);
 
 private:
+    std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> resultCallback_;
     std::shared_ptr<CameraAbility> dCameraAbility_;
     std::string protocolVersion_;
     std::string dCameraPosition_;
@@ -70,12 +76,13 @@ private:
     ResultCallbackMode metaResultMode_;
     std::set<MetaType> allResultSet_;
     std::set<MetaType> enabledResultSet_;
+    std::mutex producerMutex_;
 
     // The latest result metadata that received from the sink device.
-    common_metadata_header_t *latestProducerResultMetadata_;
+    std::shared_ptr<Camera::CameraMetadata> latestProducerMetadataResult_;
 
     // The latest result metadata that replied to the camera service.
-    common_metadata_header_t *latestConsumerResultMetadata_;
+    std::shared_ptr<Camera::CameraMetadata> latestConsumerMetadataResult_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

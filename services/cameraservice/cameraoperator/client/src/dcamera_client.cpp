@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,13 +96,36 @@ int32_t DCameraClient::UnInit()
 int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     DHLOGI("DCameraClient::UpdateCameraSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
+    if (cameraInput_ == nullptr) {
+        DHLOGI("DCameraClient::UpdateSettings cameraInput is null, cameraId: %s", GetAnonyString(cameraId_).c_str());
+        return DCAMERA_BAD_VALUE;
+    }
     for (auto& setting : settings) {
         switch (setting->type_) {
             case UPDATE_METADATA: {
                 DHLOGI("DCameraClient::UpdateCameraSettings %s update metadata settings",
-                       GetAnonyString(cameraId_).c_str());
-                std::string metadataStr = Base64Decode(setting->value_);
-                int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
+                    GetAnonyString(cameraId_).c_str());
+                std::string dcSettingValue = setting->value_;
+                std::string metadataStr = Base64Decode(dcSettingValue);
+
+                camera_metadata_item_t item;
+                std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
+                    Camera::MetadataUtils::DecodeFromString(metadataStr);
+                int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_FOCUS_MODE, &item);
+                if (ret != CAM_META_SUCCESS) {
+                    DHLOGE("DCameraClient::UpdateSettings camera metadata find focus mode failed, ret: %d", ret);
+                    return ret;
+                }
+                DHLOGI("DCameraClient::UpdateSettings focus mode: %d", item.data.u8[0]);
+
+                ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_CONTROL_EXPOSURE_MODE, &item);
+                if (ret != CAM_META_SUCCESS) {
+                    DHLOGE("DCameraClient::UpdateSettings camera metadata find exposure mode failed, ret: %d", ret);
+                    return ret;
+                }
+                DHLOGI("DCameraClient::UpdateSettings exposure mode: %d", item.data.u8[0]);
+
+                ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
                 if (ret != DCAMERA_OK) {
                     DHLOGE("DCameraClient::UpdateSettings %s update metadata settings failed, ret: %d",
                            GetAnonyString(cameraId_).c_str(), ret);
@@ -248,6 +271,7 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     }
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
+    ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetFocusCallback(inputCallback);
 
     captureSession_ = cameraManager_->CreateCaptureSession();
     if (captureSession_ == nullptr) {

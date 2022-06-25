@@ -80,7 +80,7 @@ int32_t ColorFormatProcess::ProcessData(std::vector<std::shared_ptr<DataBuffer>>
     }
 
     if (sourceConfig_.GetVideoformat() == processedConfig_.GetVideoformat()) {
-        DHLOGD("The target VideoCodecType : %d is the same as the source VideoCodecType : %d.",
+        DHLOGD("The target Video Format : %d is the same as the source Video Format : %d.",
             sourceConfig_.GetVideoformat(), processedConfig_.GetVideoformat());
         return ColorFormatDone(inputBuffers);
     }
@@ -158,8 +158,8 @@ int32_t ColorFormatProcess::GetImageUnitInfo(ImageUnitInfo& imgInfo, const std::
         DHLOGE("Get the imgData of the imgBuf failed.");
         return DCAMERA_BAD_VALUE;
     }
-    DHLOGD("imgBuf info : Videoformat %d, alignedWidth %d, alignedHeight %d, width %d, height %d, chromaOffset %d, " +
-        "imgSize %d.", imgInfo.colorFormat, imgInfo.width, imgInfo.height, imgInfo.alignedWidth,
+    DHLOGD("ColorFormatProcess imgBuf info : Videoformat %d, alignedWidth %d, alignedHeight %d, width %d, height %d," +
+        " chromaOffset %d, imgSize %d.", imgInfo.colorFormat, imgInfo.width, imgInfo.height, imgInfo.alignedWidth,
         imgInfo.alignedHeight, imgInfo.chromaOffset, imgInfo.imgSize);
     return DCAMERA_OK;
 }
