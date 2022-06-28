@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,14 +34,14 @@ void DCameraSinkControllerStateCallback::OnStateChanged(std::shared_ptr<DCameraE
     controller->OnStateChanged(event);
 }
 
-void DCameraSinkControllerStateCallback::OnMetadataResult()
+void DCameraSinkControllerStateCallback::OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     std::shared_ptr<DCameraSinkController> controller = controller_.lock();
     if (controller == nullptr) {
         DHLOGE("DCameraSinkControllerStateCallback::OnMetadataResult controller is null");
         return;
     }
-    controller->OnMetadataResult();
+    controller->OnMetadataResult(settings);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

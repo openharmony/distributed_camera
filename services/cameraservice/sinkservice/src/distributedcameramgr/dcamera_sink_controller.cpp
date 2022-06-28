@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "dcamera_sink_controller.h"
 
+#include <securec.h>
 #include <thread>
 
 #include "anonymous_string.h"
@@ -312,9 +313,39 @@ void DCameraSinkController::OnStateChanged(std::shared_ptr<DCameraEvent>& event)
     DCameraNotifyInner(DCAMERA_MESSAGE, DCAMERA_EVENT_CAMERA_ERROR, std::string("camera error"));
 }
 
-void DCameraSinkController::OnMetadataResult()
+void DCameraSinkController::OnMetadataResult(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
     DHLOGI("DCameraSinkController::OnMetadataResult dhId: %s", GetAnonyString(dhId_).c_str());
+    if (settings.empty()) {
+        DHLOGE("DCameraSinkController::OnMetadataResult camera settings is empty");
+        return;
+    }
+    DCameraMetadataSettingCmd cmd;
+    cmd.type_ = DCAMERA_PROTOCOL_TYPE_MESSAGE;
+    cmd.dhId_ = dhId_;
+    cmd.command_ = DCAMERA_PROTOCOL_CMD_METADATA_RESULT;
+    cmd.value_.assign(settings.begin(), settings.end());
+    std::string jsonStr;
+    int32_t ret = cmd.Marshal(jsonStr);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSinkController::OnMetadataResult Marshal metadata settings failed, dhId: %s ret: %d",
+            GetAnonyString(dhId_).c_str(), ret);
+        return;
+    }
+    std::shared_ptr<DataBuffer> buffer = std::make_shared<DataBuffer>(jsonStr.length() + 1);
+    ret = memcpy_s(buffer->Data(), buffer->Capacity(), (uint8_t *)jsonStr.c_str(), jsonStr.length());
+    if (ret != EOK) {
+        DHLOGE("DCameraSinkController::OnMetadataResult memcpy_s failed, dhId: %s ret: %d",
+            GetAnonyString(dhId_).c_str(), ret);
+        return;
+    }
+    ret = channel_->SendData(buffer);
+    if (ret != DCAMERA_OK) {
+        DHLOGE("DCameraSinkController::OnMetadataResult channel send data failed, dhId: %s ret: %d",
+            GetAnonyString(dhId_).c_str(), ret);
+        return;
+    }
+    DHLOGI("DCameraSinkController::OnMetadataResult dhId: %s success", GetAnonyString(dhId_).c_str());
 }
 
 void DCameraSinkController::OnSessionState(int32_t state)

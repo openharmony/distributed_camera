@@ -365,64 +365,86 @@ DCamRetCode DMetadataProcessor::ResetEnableResults()
     return SUCCESS;
 }
 
-DCamRetCode DMetadataProcessor::UpdateResultMetadata(bool &needReturn,
-    std::shared_ptr<Camera::CameraMetadata> &result)
+void DMetadataProcessor::UpdateResultMetadata(const uint64_t &resultTimestamp)
 {
-    if (latestProducerResultMetadata_ == nullptr) {
-        needReturn = false;
-        return SUCCESS;
+    DHLOGD("DMetadataProcessor::UpdateResultMetadata result callback mode: %d", metaResultMode_);
+    if (metaResultMode_ != ResultCallbackMode::PER_FRAME) {
+        return;
     }
 
-    uint32_t itemCapacity = Camera::GetCameraMetadataItemCapacity(latestProducerResultMetadata_);
-    uint32_t dataCapacity = Camera::GetCameraMetadataDataSize(latestProducerResultMetadata_);
+    std::lock_guard<std::mutex> autoLock(producerMutex_);
+    if (latestProducerMetadataResult_ == nullptr) {
+        DHLOGD("DMetadataProcessor::UpdateResultMetadata latest producer metadata result is null");
+        return;
+    }
 
-    if (metaResultMode_ == ResultCallbackMode::PER_FRAME) {
-        ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-        Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_, latestProducerResultMetadata_);
-        ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
-        needReturn = true;
-        return SUCCESS;
-    } else {
-        for (auto tag : enabledResultSet_) {
-            camera_metadata_item_t item;
-            camera_metadata_item_t anoItem;
-            int ret1 = Camera::FindCameraMetadataItem(latestProducerResultMetadata_, tag, &item);
-            int ret2 = Camera::FindCameraMetadataItem(latestConsumerResultMetadata_, tag, &anoItem);
-            if (ret1 == 0 && ret2 == 0) {
-                if (item.count != anoItem.count || item.data_type != anoItem.data_type) {
-                    ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                    Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_,
-                        latestProducerResultMetadata_);
-                    ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
-                    needReturn = true;
-                    return SUCCESS;
-                } else {
-                    uint32_t size = GetDataSize(item.data_type);
-                    for (uint32_t i = 0; i < (size * static_cast<uint32_t>(item.count)); i++) {
-                        if (*(item.data.u8 + i) != *(anoItem.data.u8 + i)) {
-                            ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                            Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_,
-                                latestProducerResultMetadata_);
-                            ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
-                            needReturn = true;
-                            return SUCCESS;
-                        }
-                    }
-                    ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                    Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_,
-                        latestProducerResultMetadata_);
-                    needReturn = false;
-                }
-            } else if (ret1 == 0 || ret2 == 0) {
-                ResizeMetadataHeader(latestConsumerResultMetadata_, itemCapacity, dataCapacity);
-                Camera::CopyCameraMetadataItems(latestConsumerResultMetadata_, latestProducerResultMetadata_);
-                ConvertToCameraMetadata(latestConsumerResultMetadata_, result);
+    UpdateAllResult(resultTimestamp);
+}
+
+void DMetadataProcessor::SetResultCallback(
+    std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk)
+{
+    resultCallback_ = resultCbk;
+}
+
+void DMetadataProcessor::UpdateAllResult(const uint64_t &resultTimestamp)
+{
+    uint32_t itemCap = Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
+    uint32_t dataSize = Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
+    DHLOGD("DMetadataProcessor::UpdateAllResult itemCapacity: %u, dataSize: %u", itemCap, dataSize);
+    std::shared_ptr<Camera::CameraMetadata> result = std::make_shared<Camera::CameraMetadata>(itemCap, dataSize);
+    int32_t ret = Camera::CopyCameraMetadataItems(result->get(), latestProducerMetadataResult_->get());
+    if (ret != CAM_META_SUCCESS) {
+        DHLOGE("DMetadataProcessor::UpdateAllResult copy metadata item failed, ret: %d", ret);
+        return;
+    }
+    resultCallback_(resultTimestamp, result);
+}
+
+void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
+{
+    bool needReturn = false;
+    uint32_t itemCap = Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
+    uint32_t dataSize = Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
+    DHLOGD("DMetadataProcessor::UpdateOnChanged itemCapacity: %u, dataSize: %u", itemCap, dataSize);
+    std::shared_ptr<Camera::CameraMetadata> result = std::make_shared<Camera::CameraMetadata>(itemCap, dataSize);
+    DHLOGD("DMetadataProcessor::UpdateOnChanged enabledResultSet size: %d", enabledResultSet_.size());
+    for (auto tag : enabledResultSet_) {
+        DHLOGD("DMetadataProcessor::UpdateOnChanged cameta device metadata tag: %d", tag);
+        camera_metadata_item_t item;
+        camera_metadata_item_t anoItem;
+        int ret1 = Camera::FindCameraMetadataItem(latestProducerMetadataResult_->get(), tag, &item);
+        int ret2 = Camera::FindCameraMetadataItem(latestConsumerMetadataResult_->get(), tag, &anoItem);
+        DHLOGD("DMetadataProcessor::UpdateOnChanged find metadata item ret: %d, %d", ret1, ret2);
+        if (ret1 != CAM_META_SUCCESS) {
+            continue;
+        }
+
+        if (ret2 == CAM_META_SUCCESS) {
+            if ((item.count != anoItem.count) || (item.data_type != anoItem.data_type)) {
                 needReturn = true;
-                return SUCCESS;
+                result->addEntry(tag, GetMetadataItemData(item), item.count);
+                continue;
             }
+            uint32_t size = GetDataSize(item.data_type);
+            DHLOGD("DMetadataProcessor::UpdateOnChanged data size: %u", size);
+            for (uint32_t i = 0; i < (size * static_cast<uint32_t>(item.count)); i++) {
+                if (*(item.data.u8 + i) != *(anoItem.data.u8 + i)) {
+                    needReturn = true;
+                    result->addEntry(tag, GetMetadataItemData(item), item.count);
+                    break;
+                }
+            }
+        } else {
+            needReturn = true;
+            result->addEntry(tag, GetMetadataItemData(item), item.count);
+            continue;
         }
     }
-    return SUCCESS;
+
+    if (needReturn) {
+        resultCallback_(resultTimestamp, result);
+    }
 }
 
 DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
@@ -432,17 +454,37 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    latestProducerResultMetadata_ = Camera::MetadataUtils::DecodeFromString(resultStr)->get();
-    if (latestProducerResultMetadata_ == nullptr) {
+    std::string metadataStr = Base64Decode(resultStr);
+    std::lock_guard<std::mutex> autoLock(producerMutex_);
+    latestConsumerMetadataResult_ = latestProducerMetadataResult_;
+    latestProducerMetadataResult_ = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    if (latestProducerMetadataResult_ == nullptr) {
         DHLOGE("Failed to decode metadata setting from string.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (!Camera::GetCameraMetadataItemCount(latestProducerResultMetadata_)) {
+    if (!Camera::GetCameraMetadataItemCount(latestProducerMetadataResult_->get())) {
         DHLOGE("Input result metadata item is empty.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
+    DHLOGD("DMetadataProcessor::SaveResultMetadata result callback mode: %d", metaResultMode_);
+    if (metaResultMode_ != ResultCallbackMode::ON_CHANGED) {
+        return SUCCESS;
+    }
+
+    uint64_t resultTimestamp = GetCurrentLocalTimeStamp();
+    if (latestConsumerMetadataResult_ == nullptr) {
+        UpdateAllResult(resultTimestamp);
+        return SUCCESS;
+    }
+
+    camera_metadata_item_entry_t* itemEntry = Camera::GetMetadataItems(latestProducerMetadataResult_->get());
+    uint32_t count = latestProducerMetadataResult_->get()->item_count;
+    for (uint32_t i = 0; i < count; i++, itemEntry++) {
+        enabledResultSet_.insert((MetaType)(itemEntry->item));
+    }
+    UpdateOnChanged(resultTimestamp);
     return SUCCESS;
 }
 
@@ -486,6 +528,37 @@ uint32_t DMetadataProcessor::GetDataSize(uint32_t type)
         size = 0;
     }
     return size;
+}
+
+void* DMetadataProcessor::GetMetadataItemData(const camera_metadata_item_t &item)
+{
+    switch (item.data_type) {
+        case META_TYPE_BYTE: {
+            return item.data.u8;
+        }
+        case META_TYPE_INT32: {
+            return item.data.i32;
+        }
+        case META_TYPE_UINT32: {
+            return item.data.ui32;
+        }
+        case META_TYPE_FLOAT: {
+            return item.data.f;
+        }
+        case META_TYPE_INT64: {
+            return item.data.i64;
+        }
+        case META_TYPE_DOUBLE: {
+            return item.data.d;
+        }
+        case META_TYPE_RATIONAL: {
+            return item.data.r;
+        }
+        default: {
+            DHLOGE("DMetadataProcessor::GetMetadataItemData invalid data type: %u", item.data_type);
+            return nullptr;
+        }
+    }
 }
 
 std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupportedFormats(const std::string &abilityInfo)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -233,6 +233,7 @@ int32_t DCameraClient::ConfigCaptureSession(std::vector<std::shared_ptr<DCameraC
     }
     std::shared_ptr<DCameraInputCallback> inputCallback = std::make_shared<DCameraInputCallback>(stateCallback_);
     ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetErrorCallback(inputCallback);
+    ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetFocusCallback(inputCallback);
 
     captureSession_ = cameraManager_->CreateCaptureSession();
     if (captureSession_ == nullptr) {

@@ -70,12 +70,14 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
     ErrorCallback onErrorCallback =
         [this](ErrorType type, int32_t errorMsg) -> void {
             if (dCameraDeviceCallback_) {
+                DHLOGI("DCameraDevice onErrorCallback type: %u, errorMsg: %d", type, errorMsg);
                 dCameraDeviceCallback_->OnError(type, errorMsg);
             }
         };
     ResultCallback onResultCallback =
         [this](uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result) -> void {
             if (dCameraDeviceCallback_) {
+                DHLOGI("DCameraDevice onResultCallback timestamp: %llu", timestamp);
                 dCameraDeviceCallback_->OnResult(timestamp, result);
             }
         };
@@ -119,11 +121,13 @@ CamRetCode DCameraDevice::UpdateSettings(const std::shared_ptr<CameraSetting> &s
         return CamRetCode::CAMERA_CLOSED;
     }
 
-    DCameraSettings dcSetting;
+    std::string abilityString = Camera::MetadataUtils::EncodeToString(settings);
+    std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
+        abilityString.length());
 
+    DCameraSettings dcSetting;
     dcSetting.type_ = DCSettingsType::UPDATE_METADATA;
-    std::string abilityStr = Camera::MetadataUtils::EncodeToString(settings);
-    dcSetting.value_ = Base64Encode(reinterpret_cast<const unsigned char *>(abilityStr.c_str()), abilityStr.length());
+    dcSetting.value_ = encodeString;
 
     std::vector<DCameraSettings> dcSettings;
     dcSettings.push_back(dcSetting);
