@@ -58,7 +58,7 @@ private:
     void SetQualityAndGpsLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
         std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings);
     void ReleasCaptureSession();
-	int32_t CameraServiceErrorType(const int32_t errorType);
+    int32_t CameraServiceErrorType(const int32_t errorType);
 
     bool isInit_;
     std::string cameraId_;
