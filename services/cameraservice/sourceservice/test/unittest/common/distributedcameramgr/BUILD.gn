@@ -46,7 +46,6 @@ config("module_private_config") {
     "${fwk_utils_path}/include/eventbus",
     "${fwk_common_path}/utils/include",
     "${fwk_common_path}/log/include",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/client/provider",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
