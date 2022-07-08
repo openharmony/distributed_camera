@@ -91,13 +91,19 @@ int32_t DCameraClient::UnInit()
 
 int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
-    DHLOGI("DCameraClientCommon::UpdateCameraSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
+    DHLOGI("DCameraClientCommon::UpdateSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
+    if (cameraInput_ == nullptr) {
+        DHLOGI("DCameraClientCommon::UpdateSettings cameraInput is null, cameraId: %s",
+            GetAnonyString(cameraId_).c_str());
+        return DCAMERA_BAD_VALUE;
+    }
     for (auto& setting : settings) {
         switch (setting->type_) {
             case UPDATE_METADATA: {
-                DHLOGI("DCameraClientCommon::UpdateCameraSettings %s update metadata settings",
-                       GetAnonyString(cameraId_).c_str());
-                std::string metadataStr = Base64Decode(setting->value_);
+                DHLOGI("DCameraClientCommon::UpdateSettings %s update metadata settings",
+                    GetAnonyString(cameraId_).c_str());
+                std::string dcSettingValue = setting->value_;
+                std::string metadataStr = Base64Decode(dcSettingValue);
                 int32_t ret = ((sptr<CameraStandard::CameraInput> &)cameraInput_)->SetCameraSettings(metadataStr);
                 if (ret != DCAMERA_OK) {
                     DHLOGE("DCameraClientCommon::UpdateSettings %s update metadata settings failed, ret: %d",
@@ -112,7 +118,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
             }
         }
     }
-    DHLOGI("DCameraClientCommon::UpdateCameraSettings %s success", GetAnonyString(cameraId_).c_str());
+    DHLOGI("DCameraClientCommon::UpdateSettings %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -157,7 +163,7 @@ int32_t DCameraClient::CameraServiceErrorType(const int32_t errorType)
 int32_t DCameraClient::StopCapture()
 {
     DHLOGI("DCameraClientCommon::StopCapture cameraId: %s", GetAnonyString(cameraId_).c_str());
-    ReleasCaptureSession();
+    ReleaseCaptureSession();
 
     if (cameraInput_ != nullptr) {
         DHLOGI("DCameraClientCommon::StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
@@ -195,7 +201,7 @@ int32_t DCameraClient::StopCapture()
     return DCAMERA_OK;
 }
 
-void DCameraClient::ReleasCaptureSession()
+void DCameraClient::ReleaseCaptureSession()
 {
     if (captureSession_ == nullptr) {
         return;
@@ -420,6 +426,24 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
         return ret;
     }
     return DCAMERA_OK;
+}
+
+void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
+{
+    DHLOGI("DCameraClientCommon::SetPhotoCaptureRotation cameraId: %s", GetAnonyString(cameraId_).c_str());
+}
+
+void DCameraClient::SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
+{
+    DHLOGI("DCameraClientCommon::SetPhotoCaptureQuality cameraId: %s", GetAnonyString(cameraId_).c_str());
+}
+
+void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
+{
+    DHLOGI("DCameraClientCommon::SetPhotoCaptureLocation cameraId: %s", GetAnonyString(cameraId_).c_str());
 }
 
 int32_t DCameraClient::StartVideoOutput()
