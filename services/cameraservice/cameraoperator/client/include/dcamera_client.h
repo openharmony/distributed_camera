@@ -55,9 +55,13 @@ private:
     int32_t StartCaptureInner(std::shared_ptr<DCameraCaptureInfo>& info);
     int32_t StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& info);
     int32_t StartVideoOutput();
-    void SetQualityAndGpsLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
-        std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings);
-    void ReleasCaptureSession();
+    void SetPhotoCaptureRotation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+        std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
+    void SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+        std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
+    void SetPhotoCaptureLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+        std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting);
+    void ReleaseCaptureSession();
     int32_t CameraServiceErrorType(const int32_t errorType);
 
     bool isInit_;

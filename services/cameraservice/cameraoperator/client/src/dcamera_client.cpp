@@ -15,7 +15,6 @@
 
 #include "dcamera_client.h"
 
-#include <securec.h>
 #include "anonymous_string.h"
 #include "camera_util.h"
 #include "camera_metadata_operator.h"
@@ -32,10 +31,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t LATITUDE = 0;
-const int32_t LONGITUDE = 1;
-const int32_t ALTITUDE = 2;
-
 DCameraClient::DCameraClient(const std::string& dhId)
 {
     DHLOGI("DCameraClient Constructor dhId: %s", GetAnonyString(dhId).c_str());
@@ -96,7 +91,7 @@ int32_t DCameraClient::UnInit()
 
 int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSettings>>& settings)
 {
-    DHLOGI("DCameraClient::UpdateCameraSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
+    DHLOGI("DCameraClient::UpdateSettings cameraId: %s", GetAnonyString(cameraId_).c_str());
     if (cameraInput_ == nullptr) {
         DHLOGI("DCameraClient::UpdateSettings cameraInput is null, cameraId: %s", GetAnonyString(cameraId_).c_str());
         return DCAMERA_BAD_VALUE;
@@ -104,8 +99,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
     for (auto& setting : settings) {
         switch (setting->type_) {
             case UPDATE_METADATA: {
-                DHLOGI("DCameraClient::UpdateCameraSettings %s update metadata settings",
-                    GetAnonyString(cameraId_).c_str());
+                DHLOGI("DCameraClient::UpdateSettings %s update metadata settings", GetAnonyString(cameraId_).c_str());
                 std::string dcSettingValue = setting->value_;
                 std::string metadataStr = Base64Decode(dcSettingValue);
 
@@ -136,7 +130,7 @@ int32_t DCameraClient::UpdateSettings(std::vector<std::shared_ptr<DCameraSetting
             }
         }
     }
-    DHLOGI("DCameraClient::UpdateCameraSettings %s success", GetAnonyString(cameraId_).c_str());
+    DHLOGI("DCameraClient::UpdateSettings %s success", GetAnonyString(cameraId_).c_str());
     return DCAMERA_OK;
 }
 
@@ -159,7 +153,8 @@ int32_t DCameraClient::StartCapture(std::vector<std::shared_ptr<DCameraCaptureIn
         }
         int32_t ret = StartCaptureInner(info);
         if (ret != DCAMERA_OK) {
-            DHLOGE("DCameraClient::StartCapture failed, cameraId: %s, ret: %d", GetAnonyString(cameraId_).c_str(), ret);
+            DHLOGE("DCameraClient::StartCapture failed, cameraId: %s, ret: %d",
+                GetAnonyString(cameraId_).c_str(), ret);
             return CameraServiceErrorType(ret);
         }
     }
@@ -197,7 +192,7 @@ int32_t DCameraClient::StopCapture()
         photoOutput_->Release();
         photoOutput_ = nullptr;
     }
-    ReleasCaptureSession();
+    ReleaseCaptureSession();
     if (cameraInput_ != nullptr) {
         DHLOGI("DCameraClient::StopCapture %s release cameraInput", GetAnonyString(cameraId_).c_str());
         cameraInput_->Release();
@@ -232,7 +227,7 @@ int32_t DCameraClient::StopCapture()
     return DCAMERA_OK;
 }
 
-void DCameraClient::ReleasCaptureSession()
+void DCameraClient::ReleaseCaptureSession()
 {
     if (captureSession_ == nullptr) {
         return;
@@ -465,24 +460,14 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
         return DCAMERA_OK;
     }
 
-    camera_metadata_item_t item;
-    CameraStandard::PhotoCaptureSetting::RotationConfig rotation =
-            CameraStandard::PhotoCaptureSetting::RotationConfig::Rotation_0;
-    std::shared_ptr<Camera::CameraMetadata> cameraMetadata =
-            Camera::MetadataUtils::DecodeFromString(Base64Decode(metadataSetting));
-    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
-    if (ret == DCAMERA_OK) {
-        DHLOGI("DCameraClient::StartPhotoOutput %s find camera metadata item", GetAnonyString(cameraId_).c_str());
-        rotation = static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(item.data.i32[0]);
-    }
-
-    DHLOGI("DCameraClient::StartPhotoOutput %s photo capture settings set rotation: %d",
-           GetAnonyString(cameraId_).c_str(), rotation);
-    std::shared_ptr<CameraStandard::PhotoCaptureSetting> photoCaptureSettings =
-            std::make_shared<CameraStandard::PhotoCaptureSetting>();
-    photoCaptureSettings->SetRotation(rotation);
-    SetQualityAndGpsLocation(cameraMetadata, photoCaptureSettings);
-    ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture(photoCaptureSettings);
+    std::string metadataStr = Base64Decode(metadataSetting);
+    std::shared_ptr<Camera::CameraMetadata> cameraMetadata = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting> photoCaptureSetting =
+        std::make_shared<CameraStandard::PhotoCaptureSetting>();
+    SetPhotoCaptureRotation(cameraMetadata, photoCaptureSetting);
+    SetPhotoCaptureQuality(cameraMetadata, photoCaptureSetting);
+    SetPhotoCaptureLocation(cameraMetadata, photoCaptureSetting);
+    int32_t ret = ((sptr<CameraStandard::PhotoOutput> &)photoOutput_)->Capture(photoCaptureSetting);
     if (ret != DCAMERA_OK) {
         DHLOGE("DCameraClient::StartPhotoOutput %s photoOutput capture failed, ret: %d",
                GetAnonyString(cameraId_).c_str(), ret);
@@ -491,40 +476,55 @@ int32_t DCameraClient::StartPhotoOutput(std::shared_ptr<DCameraCaptureInfo>& inf
     return DCAMERA_OK;
 }
 
-void DCameraClient::SetQualityAndGpsLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
-    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSettings)
+void DCameraClient::SetPhotoCaptureRotation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
 {
+    uint32_t rotationCount = 1;
+    camera_metadata_item_t item;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_ORIENTATION, &item);
+    if ((ret == CAM_META_SUCCESS) && (rotationCount == item.count)) {
+        CameraStandard::PhotoCaptureSetting::RotationConfig rotation =
+            static_cast<CameraStandard::PhotoCaptureSetting::RotationConfig>(item.data.i32[0]);
+        photoCaptureSetting->SetRotation(rotation);
+        DHLOGI("DCameraClient::SetPhotoCaptureRotation %s photo capture settings set %d rotation: %d",
+            GetAnonyString(cameraId_).c_str(), item.count, rotation);
+    }
+}
+
+void DCameraClient::SetPhotoCaptureQuality(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
+{
+    uint32_t qualityCount = 1;
     camera_metadata_item_t item;
     int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_QUALITY, &item);
-    if (ret == CAM_META_SUCCESS) {
-        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera quality item",
-            GetAnonyString(cameraId_).c_str());
+    if ((ret == CAM_META_SUCCESS) && (qualityCount == item.count)) {
         CameraStandard::PhotoCaptureSetting::QualityLevel quality =
             static_cast<CameraStandard::PhotoCaptureSetting::QualityLevel>(item.data.u8[0]);
-        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set quality: %d",
-            GetAnonyString(cameraId_).c_str(), quality);
-        photoCaptureSettings->SetQuality(quality);
+        photoCaptureSetting->SetQuality(quality);
+        DHLOGI("DCameraClient::SetPhotoCaptureQuality %s photo capture settings set %d quality: %d",
+            GetAnonyString(cameraId_).c_str(), item.count, quality);
     }
-    ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);
-    if (ret == CAM_META_SUCCESS) {
-        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s find camera gpsCoordinates item",
-            GetAnonyString(cameraId_).c_str());
-        double gpsCoordinates[3] = {-1.0, -1.0, -1.0};
-        if (memcpy_s(gpsCoordinates, sizeof(gpsCoordinates), item.data.d, sizeof(gpsCoordinates)) != EOK) {
-            DHLOGE("DCameraClient::SetQualityAndGpsLocation memcpy_s gpsCoordinates failed");
-            return;
-        }
-        DHLOGI("DCameraClient::SetQualityAndGpsLocation %s photo capture settings set "
-            "gpsCoordinates[LATITUDE]: %f, gpsCoordinates[LONGITUDE]: %f,  gpsCoordinates[ALTITUDE]: %f",
-            GetAnonyString(cameraId_).c_str(), gpsCoordinates[LATITUDE],
-            gpsCoordinates[LONGITUDE], gpsCoordinates[ALTITUDE]);
+}
+
+void DCameraClient::SetPhotoCaptureLocation(const std::shared_ptr<Camera::CameraMetadata>& cameraMetadata,
+    std::shared_ptr<CameraStandard::PhotoCaptureSetting>& photoCaptureSetting)
+{
+    uint32_t locationCount = 3;
+    camera_metadata_item_t item;
+    int32_t ret = Camera::FindCameraMetadataItem(cameraMetadata->get(), OHOS_JPEG_GPS_COORDINATES, &item);
+    if ((ret == CAM_META_SUCCESS) && (locationCount == item.count)) {
+        int32_t latitudeIndex = 0;
+        int32_t longitudeIndex = 1;
+        int32_t altitudeIndex = 2;
         std::unique_ptr<CameraStandard::Location> location = std::make_unique<CameraStandard::Location>();
-        location->latitude = gpsCoordinates[LATITUDE];
-        location->longitude = gpsCoordinates[LONGITUDE];
-        location->altitude = gpsCoordinates[ALTITUDE];
-        photoCaptureSettings->SetLocation(location);
+        location->latitude = item.data.d[latitudeIndex];
+        location->longitude = item.data.d[longitudeIndex];
+        location->altitude = item.data.d[altitudeIndex];
+        photoCaptureSetting->SetLocation(location);
+        DHLOGI("DCameraClient::SetPhotoCaptureLocation %s photo capture settings set %d location: " +
+            "latitude=%f, longitude=%f, altitude=%f", GetAnonyString(cameraId_).c_str(), item.count,
+            item.data.d[latitudeIndex], item.data.d[longitudeIndex], item.data.d[altitudeIndex]);
     }
-    return;
 }
 
 int32_t DCameraClient::StartVideoOutput()
