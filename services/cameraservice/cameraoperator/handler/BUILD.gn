@@ -47,7 +47,7 @@ ohos_shared_library("distributed_camera_handler") {
 
   sources = [ "${services_path}/cameraservice/cameraoperator/client/src/callback/dcamera_manager_callback.cpp" ]
 
-  if ("${product_name}" == "m40") {
+  if (!distributed_camera_common) {
     sources += [ "src/dcamera_handler.cpp" ]
   } else {
     sources += [ "src/dcamera_handler_common.cpp" ]

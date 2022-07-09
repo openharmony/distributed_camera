@@ -57,7 +57,7 @@ ohos_shared_library("distributed_camera_client") {
     "src/callback/dcamera_video_callback.cpp",
   ]
 
-  if ("${product_name}" == "m40") {
+  if (!distributed_camera_common) {
     sources += [
       "src/dcamera_client.cpp",
       "src/listener/dcamera_photo_surface_listener.cpp",
