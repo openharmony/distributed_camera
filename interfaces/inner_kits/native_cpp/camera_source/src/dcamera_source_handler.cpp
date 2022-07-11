@@ -122,6 +122,11 @@ int32_t DCameraSourceHandler::RegisterDistributedHardware(const std::string& dev
 
     std::lock_guard<std::mutex> autoLock(optLock_);
     std::string reqId = GetRandomID();
+
+    if (callback_ == nullptr) {
+        DHLOGE("DCameraSourceHandler RegisterDistributedHardware DCameraSourceCallback is null.");
+        return DCAMERA_BAD_VALUE;
+    }
     callback_->PushRegCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->RegisterDistributedHardware(devId, dhId, reqId, param);
     if (ret != DCAMERA_OK) {
@@ -145,6 +150,11 @@ int32_t DCameraSourceHandler::UnregisterDistributedHardware(const std::string& d
 
     std::lock_guard<std::mutex> autoLock(optLock_);
     std::string reqId = GetRandomID();
+
+    if (callback_ == nullptr) {
+        DHLOGE("DCameraSourceHandler RegisterDistributedHardware DCameraSourceCallback is null.");
+        return DCAMERA_BAD_VALUE;
+    }
     callback_->PushUnregCallback(reqId, callback);
     int32_t ret = dCameraSourceSrv->UnregisterDistributedHardware(devId, dhId, reqId);
     if (ret != DCAMERA_OK) {
