@@ -16,11 +16,7 @@ distributedcamera_path = "//foundation/distributedhardware/distributed_camera"
 distributedhardwarefwk_path =
     "//foundation/distributedhardware/distributed_hardware_fwk"
 
-hdf_framework_path = "//drivers/hdf_core/framework"
-
 camera_hdf_path = "//drivers/peripheral"
-
-display_hdf_path = "//drivers/peripheral/display"
 
 camerastandard_path = "//foundation/multimedia/camera_standard"
 
@@ -33,8 +29,6 @@ common_path = "${distributedcamera_path}/common"
 services_path = "${distributedcamera_path}/services"
 
 innerkits_path = "${distributedcamera_path}/interfaces/inner_kits"
-
-distributedcamera_hdf_path = "${distributedcamera_path}/camera_hdf"
 
 fwk_utils_path = "${distributedhardwarefwk_path}/utils"
 
