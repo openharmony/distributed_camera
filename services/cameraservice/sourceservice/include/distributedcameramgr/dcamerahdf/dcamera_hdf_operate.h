@@ -32,7 +32,7 @@ using OHOS::HDI::ServiceManager::V1_0::ServStatListenerStub;
 const std::string CAMERA_SERVICE_NAME = "distributed_camera_service";
 const std::string PROVIDER_SERVICE_NAME = "distributed_camera_provider_service";
 constexpr uint16_t INVALID_VALUE = 0xffff;
-constexpr int32_t WAIT_TIME = 500;
+constexpr int32_t WAIT_TIME = 2000;
 
 namespace OHOS {
 namespace DistributedHardware {
