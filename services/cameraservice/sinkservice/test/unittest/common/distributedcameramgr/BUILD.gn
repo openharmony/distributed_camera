@@ -88,7 +88,7 @@ ohos_unittest("DCameraSinkMgrTest") {
     "drivers_interface_distributed_camera:libdistributed_camera_provider_proxy_1.0",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
-    "multimedia_media_standard:media_client",
+    "multimedia_player_framework:media_client",
   ]
 
   defines = [

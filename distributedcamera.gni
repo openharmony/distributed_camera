@@ -20,7 +20,7 @@ camera_hdf_path = "//drivers/peripheral"
 
 camerastandard_path = "//foundation/multimedia/camera_standard"
 
-mediastandard_path = "//foundation/multimedia/media_standard"
+mediastandard_path = "//foundation/multimedia/player_framework"
 
 graphicstandard_path = "//foundation/graphic/graphic_2d"
 

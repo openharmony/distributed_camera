@@ -23,7 +23,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "//foundation/graphic/graphic_2d/interfaces/innerkits/common",
     "//foundation/graphic/graphic_2d/interfaces/innerkits/surface",
     "//drivers/peripheral/display/interfaces/include",
-    "//foundation/multimedia/media_standard/interfaces/innerkits/native/media/include",
+    "//foundation/multimedia/player_framework/interfaces/innerkits/native/media/include",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/log",
@@ -86,7 +86,7 @@ ohos_shared_library("distributed_camera_data_process") {
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "multimedia_media_standard:media_client",
+    "multimedia_player_framework:media_client",
   ]
 
   subsystem_name = "distributedhardware"
