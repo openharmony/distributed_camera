@@ -13,33 +13,29 @@
  * limitations under the License.
  */
 
-#include "sourceproxydcameranotify_fuzzer.h"
+#include "sinkonloadsystemabilityfail_fuzzer.h"
 
-#include "dcamera_source_callback.h"
+#include <cstddef>
+#include <cstdint>
+
+#include "dcamera_sink_load_callback.h"
+#include "dcamera_sink_handler.h"
 #include "distributed_camera_constants.h"
-#include "distributed_camera_source_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SourceProxyDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
+void SinkOnLoadSystemAbilityFailFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <= 0)) {
+    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
+    int32_t systemAbilityId = *(reinterpret_cast<const int32_t *>(data));
+    std::string params(reinterpret_cast<const char*>(data), size);
+    std::shared_ptr<DCameraSinkLoadCallback> callback = std::make_shared<DCameraSinkLoadCallback>(params);
 
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string events(reinterpret_cast<const char*>(data), size);
-
-    sptr<ISystemAbilityManager> samgr =
-            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_CAMERA_SOURCE_SA_ID);
-    std::shared_ptr<DistributedCameraSourceProxy> dCSourceProxy =
-        std::make_shared<DistributedCameraSourceProxy>(remoteObject);
-
-    dCSourceProxy->DCameraNotify(devId, dhId, events);
+    callback->OnLoadSystemAbilityFail(systemAbilityId);
 }
 }
 }
@@ -48,7 +44,6 @@ void SourceProxyDCameraNotifyFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::SourceProxyDCameraNotifyFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkOnLoadSystemAbilityFailFuzzTest(data, size);
     return 0;
 }
-
