@@ -32,7 +32,7 @@
                 "graphic_chipsetsdk",
                 "eventhandler",
                 "multimedia_camera_standard",
-                "multimedia_media_standard",
+                "multimedia_player_framework",
                 "graphic_standard",
                 "distributed_hardware_fwk",
                 "hdf_core",
